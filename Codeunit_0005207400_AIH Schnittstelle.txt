@@ -1,0 +1,349 @@
+OBJECT Codeunit 5207400 AIH Schnittstelle
+{
+  OBJECT-PROPERTIES
+  {
+    Date=15.05.25;
+    Time=16:31:39;
+    Modified=Yes;
+    Version List=HAB;
+  }
+  PROPERTIES
+  {
+    OnRun=VAR
+            RecRefL@1109400003 : RecordRef;
+            ActionTypeL@1109400002 : 'Launch,Send,Receive,Cockpit Functions,Show,Process,Close,Delete,Log Entry,Batch Close,Batch Delete';
+            TypeL@1109400001 : 'InitParam,GetParam';
+            OpenL@1109400000 : Boolean;
+          BEGIN
+            // DB îffnen
+            OpenDB();
+            ContactG.RESET;
+            ContactG.SETCURRENTKEY("Prospect No.");
+            ContactG.SETRANGE("Prospect No.", ContactG."Prospect No.");
+            IF ContactG.FINDSET THEN
+            MESSAGE('GEFUNDEN');
+
+            // Hole den Datensatz von der Contact Card
+            IF ContactG."Prospect No." <> '' THEN BEGIN
+              MESSAGE('Kontakt gefunden: ' + ContactG."No.");
+              CheckCustomer();
+              ExpCustData();
+            END ELSE BEGIN
+              // Falls kein Kontakt gefunden wurde
+                MESSAGE(Text011);
+            END;
+
+
+            CustomerExistsG := 99;
+            ExportSuccessfullyG := 99;
+
+
+            // RÅckmeldung an Benutzer
+            CASE ExportSuccessfullyG OF
+              -1: MESSAGE(Text001);
+               2: MESSAGE(Text004);
+               3: ;
+              ELSE
+                MESSAGE(Text002);
+            END;
+
+            // DB Schliessen
+            CloseDb();
+          END;
+
+  }
+  CODE
+  {
+    VAR
+      ContactG@1109400004 : Record 5047089;
+      AIAnwender@1109400002 : Automation "{74359121-5B44-11D5-A68B-00105A5E4EC4} 1.1:{74359125-5B44-11D5-A68B-00105A5E4EC4}:'Anwender Datenbank DLL'.AnwenderData";
+      VehicleGOption@1109400001 : Record 5025422;
+      AddressSalutation@1109400000 : Record 5029133;
+      Text001@1109400019 : TextConst 'ENU=Data have been exported successfully.;DES=Daten wurden erfolgreich exportiert.';
+      Text002@1109400018 : TextConst 'ENU=Data could not be exported.;DES=Daten konnten nicht exportiert werden.';
+      Text003@1109400017 : TextConst 'ENU=Customer already exists in AUTO-I Autohandel. Should the data be updated?;DES=Kunde ist bereits in AUTO-I Autohandel vorhanden. Sollen die Daten aktualisiert werden?';
+      Text004@1109400016 : TextConst 'ENU=Data were updated successfully.;DES=Daten wurden erfolgreich aktualisiert.';
+      Text005@1109400015 : TextConst 'ENU=Address Salutation Code and Customer Type do not match. Please correct first.;DES=Adressanredecode und Kundenart stimmen nicht Åberein. Bitte zuerst korrigieren.';
+      Text006@1109400011 : TextConst 'ENU=No data found.;DES=Keine Daten gefunden.';
+      Text007@1109400008 : TextConst 'ENU=AUTO-I;DES=AUTO-I';
+      Text008@1109400006 : TextConst 'ENU=Database could not be opened.;DES=Datenbank konnte nicht geîffnet werden.';
+      Text009@1109400003 : TextConst 'ENU=Database was opened sucesfully.;DES=Datenkbank konnte erfolgreich geîffnet werden';
+      Text010@1109400005 : TextConst 'ENU=No matching customer found.;DES=Kein passender Kunde gefunden.';
+      CustomerExistsG@1109400020 : Integer;
+      ExportSuccessfullyG@1109400021 : Integer;
+      AIDCustomerNoG@1109400022 : Code[10];
+      AIDCredentials@1109400023 : Record 5045163;
+      Text011@1109400007 : TextConst 'ENU=Customer not Found.;DES=" Kunde nicht gefunden"';
+
+    PROCEDURE OpenDB@1109400000() : Boolean;
+    VAR
+      OpenDB@1109400000 : Integer;
+    BEGIN
+
+          // DB îffnen
+          IF ISCLEAR(AIAnwender) THEN
+            CREATE(AIAnwender);
+
+          OpenDB := AIAnwender.OpenDB(AIDCredentials."Directory Database");
+
+          IF OpenDB = -1 THEN
+            MESSAGE(Text009)
+          ELSE
+        MESSAGE(Text008);
+    END;
+
+    LOCAL PROCEDURE CloseDb@5045152();
+    BEGIN
+      AIAnwender.CloseDB;
+      CLEAR(AIAnwender);
+    END;
+
+    LOCAL PROCEDURE PushClient@1000000001();
+    BEGIN
+      AIAnwender.AddKunde('MusterTest');
+      AIAnwender.Kunden.Field('ReferenzNr', '100003');
+      AIAnwender.Kunden.Field('Suchbegriff', 'MUSTER');
+      AIAnwender.Kunden.Field('Vorname', 'Hakim');
+      AIAnwender.Kunden.Field('Adresse1', 'Prof');
+      AIAnwender.Kunden.Field('Adresse2', 'Lystrasse 44');
+      AIAnwender.Kunden.Field('Adresse3', 'Post');
+      AIAnwender.Kunden.Field('PLZ', '2503');
+      AIAnwender.Kunden.Field('Ort', 'Biel/Bienne');
+      AIAnwender.Kunden.Update
+    END;
+
+    PROCEDURE GetClient@1109400001();
+    BEGIN
+
+        // Kunden suchen via ReferenzNr
+        IF AIAnwender.FindKunden(9, ContactG."No.") = -1 THEN BEGIN
+          AIAnwender.Kunden.MoveFirst;
+          ContactG.INIT;
+          ContactG."No." := AIAnwender.Kunden.Field('KundenNr');
+          ContactG."Last Name" := AIAnwender.Kunden.Field('Name');
+          ContactG."First Name" := AIAnwender.Kunden.Field('Vorname');
+          ContactG.Address := AIAnwender.Kunden.Field('Adresse1');
+          ContactG."Address 2" := AIAnwender.Kunden.Field('Adresse2');
+          ContactG.City := AIAnwender.Kunden.Field('Ort');
+          ContactG."Post Code" := AIAnwender.Kunden.Field('PLZ');
+          ContactG."Phone No." := AIAnwender.Kunden.Field('Telefon');
+          ContactG."E-Mail" := AIAnwender.Kunden.Field('Email');
+          ContactG."No." := AIAnwender.Kunden.Field('ReferenzNr');
+          ContactG.INSERT;
+          ContactG.MODIFY;
+          MESSAGE('Kunde erfolgreich von Auto-i importiert.');
+        END ELSE
+          MESSAGE('Kunde mit ReferenzNr 10005 nicht gefunden.');
+    END;
+
+    PROCEDURE ExpCustData@1109400003();
+    VAR
+      CustomerClassL@1109400006 : Text[1];
+      DateOfBirthL@1109400005 : Text[10];
+      LetterSalutationL@1109400004 : Record 5029135;
+      CustomerExistsL@1109400003 : Integer;
+      ConfirmL@1109400002 : Boolean;
+      ProfessionL@1109400001 : Record 5029123;
+      ActionL@1109400000 : Action;
+    BEGIN
+      // Check ob Adressanredecode mit Kundenart Åbereinstimmt. Ansonsten funktioniert die DatenÅbermittlung nicht
+      AddressSalutation.RESET;
+      AddressSalutation.SETCURRENTKEY(Code);
+      AddressSalutation.SETRANGE(Code, ContactG."Address Salutation Code");
+      IF AddressSalutation.FIND('-') THEN
+        IF AddressSalutation."Customer Type" <> ContactG."Customer Type" THEN
+          ERROR(Text005);
+
+      IF CustomerExistsG <> 0 THEN BEGIN
+        ConfirmL := DIALOG.CONFIRM(Text003, FALSE);
+        IF NOT ConfirmL THEN
+          EXIT;
+        ExportSuccessfullyG := 2;
+        AIAnwender.Kunden.Field('Name', ContactG."Last Name");
+      END ELSE
+        ExportSuccessfullyG := AIAnwender.AddKunde(ContactG."Last Name");
+      // Kundendaten zu AutoIHandel
+      // Allgemein
+      AIAnwender.Kunden.Field('ReferenzNr', ContactG."No.");
+      AIAnwender.Kunden.Field('Suchbegriff', ContactG."Search Name");
+      AIAnwender.Kunden.Field('Vorname', ContactG."First Name");
+      AIAnwender.Kunden.Field('Adresse1', ContactG."Name 2");
+      AIAnwender.Kunden.Field('Adresse2', ContactG.Address);
+      AIAnwender.Kunden.Field('Adresse3', ContactG."Address 2");
+      AIAnwender.Kunden.Field('PLZ', ContactG."Post Code");
+      AIAnwender.Kunden.Field('Ort', ContactG.City);
+
+      AddressSalutation.RESET;
+      AddressSalutation.SETCURRENTKEY(Code);
+      AddressSalutation.SETRANGE(Code, ContactG."Address Salutation Code");
+      IF AddressSalutation.FIND('-') THEN
+        AIAnwender.Kunden.Field('Anrede', AddressSalutation.Description);
+
+      IF ContactG."Country Code" <> '' THEN
+        AIAnwender.Kunden.Field('Land', ContactG."Country Code")
+      ELSE
+        AIAnwender.Kunden.Field('Land', 'CH');
+
+      CASE ContactG."Customer Type" OF
+        0,1:
+          CustomerClassL := '1';
+        2:
+          CustomerClassL := '2';
+        ELSE
+          CustomerClassL := '0';
+      END;
+      AIAnwender.Kunden.Field('KndKat', CustomerClassL);
+
+      LetterSalutationL.RESET;
+      LetterSalutationL.SETCURRENTKEY(Code);
+      LetterSalutationL.SETRANGE(Code, ContactG."Letter Salutation Code");
+      IF LetterSalutationL.FIND('-') THEN
+        IF CustomerClassL <> '2' THEN
+          AIAnwender.Kunden.Field('AnredeTxt', LetterSalutationL.Description + ' ' + ContactG."Last Name")
+        ELSE
+          AIAnwender.Kunden.Field('AnredeTxt', LetterSalutationL.Description);
+
+      // Kommunikation
+      IF CustomerClassL = '2' THEN BEGIN
+        AIAnwender.Kunden.Field('Telefon', ContactG."Phone No.");
+        AIAnwender.Kunden.Field('Natel', ContactG."Mobile Phone No.");
+        AIAnwender.Kunden.Field('Fax', ContactG."Fax No.");
+        AIAnwender.Kunden.Field('EMail', ContactG."E-Mail");
+      END ELSE BEGIN
+        AIAnwender.Kunden.Field('Telefon', ContactG."Home Phone No.");
+        AIAnwender.Kunden.Field('Natel', ContactG."Home Mobile Phone No.");
+        AIAnwender.Kunden.Field('Fax', ContactG."Home Fax No.");
+        AIAnwender.Kunden.Field('EMail', ContactG."Home E-Mail");
+        AIAnwender.Kunden.Field('GTelefon', ContactG."Phone No.");
+        AIAnwender.Kunden.Field('GDirekt', ContactG."Mobile Phone No.");
+        AIAnwender.Kunden.Field('GFax', ContactG."Fax No.");
+        AIAnwender.Kunden.Field('GEMail', ContactG."E-Mail");
+      END;
+      // Verbindungen
+      IF ContactG."No." <> '' THEN
+        AIAnwender.Kunden.Field('KndStatus', '2')
+      ELSE
+        AIAnwender.Kunden.Field('KndStatus', '1');
+      AIAnwender.Kunden.Update;
+    END;
+
+    PROCEDURE ImpCustData@1109400002();
+    VAR
+      FindQuery1L@1109400008 : Integer;
+      FindQuery2L@1109400007 : Integer;
+      FindQuery3L@1109400006 : Integer;
+      CustomerClassL@1109400004 : Integer;
+    BEGIN
+      // Kundendaten von AID in Incadea importieren
+      CASE ContactG."Customer Type" OF
+        0,1:
+          CustomerClassL := 1;
+        2:
+          CustomerClassL := 2;
+        ELSE
+          CustomerClassL := 0;
+      END;
+
+      FindQuery1L :=AIAnwender.FindKunden(9, 'ReferenzNr="' + ContactG."No." + '" AND Name ="' + ContactG."Last Name" + '"');
+      IF FindQuery1L = 0 THEN
+        FindQuery2L :=AIAnwender.FindKunden(9, 'ReferenzNr IS NULL OR ReferenzNr="" AND Name="' + ContactG."Last Name" + '"');
+
+      IF (FindQuery1L = -1) OR (FindQuery2L = -1) THEN BEGIN
+       AIAnwender.Kunden.MoveFirst;
+        ContactG.INIT;
+        REPEAT
+          ContactG."Prospect No." :=AIAnwender.Kunden.Field('KundenNr');
+          ContactG."Name 2" :=AIAnwender.Kunden.Field('Suchbegriff');
+          ContactG."Address Salutation Code" :=AIAnwender.Kunden.Field('Anrede');
+          ContactG."Last Name" := COPYSTR(AIAnwender.Kunden.Field('Name'),1, MAXSTRLEN(ContactG."Last Name"));
+          ContactG."First Name" :=AIAnwender.Kunden.Field('Vorname');
+          ContactG.Address :=AIAnwender.Kunden.Field('Adresse1');
+          ContactG."Address 2" :=AIAnwender.Kunden.Field('Adresse2');
+          ContactG.City :=AIAnwender.Kunden.Field('Adresse3');
+          ContactG."Post Code" :=AIAnwender.Kunden.Field('PLZ');
+          ContactG."Phone No." :=AIAnwender.Kunden.Field('Telefon Nr.');
+          ContactG."Country Code" :=AIAnwender.Kunden.Field('Land');
+
+          IF CustomerClassL = 2 THEN BEGIN
+            ContactG."Fax No." :=AIAnwender.Kunden.Field('Telefon');
+            ContactG."Mobile Phone No." :=AIAnwender.Kunden.Field('Natel');
+            ContactG."Fax No." :=AIAnwender.Kunden.Field('Fax');
+            ContactG."E-Mail" :=AIAnwender.Kunden.Field('Email');
+          END ELSE BEGIN
+            ContactG."Home Phone No." :=AIAnwender.Kunden.Field('Telefon');
+            ContactG."Home Mobile Phone No." :=AIAnwender.Kunden.Field('Natel');
+            ContactG."Home Fax No." :=AIAnwender.Kunden.Field('Fax');
+            ContactG."Home E-Mail" :=AIAnwender.Kunden.Field('EMail');
+            ContactG."Fax No." :=AIAnwender.Kunden.Field('GTelefon');
+            ContactG."Mobile Phone No." :=AIAnwender.Kunden.Field('GDirekt');
+            ContactG."Fax No." :=AIAnwender.Kunden.Field('GFax');
+            ContactG."E-Mail" :=AIAnwender.Kunden.Field('GEMail');
+          END;
+
+          IF FindQuery2L = -1 THEN
+            ContactG."No." :=AIAnwender.Kunden.Field('ReferenzNr');
+
+          IF NOT ContactG.MODIFY THEN
+            ContactG.INSERT;
+
+         AIAnwender.Kunden.MoveNext;
+
+        UNTIL
+        AIAnwender.Kunden.EOF = -1;  FindQuery3L :=AIAnwender.FindKunden(1, ContactG."No.");
+        IF FindQuery3L = -1 THEN BEGIN
+          IF ContactG."No." <> '' THEN
+           AIAnwender.Kunden.Field('KndStatus', '2')
+          ELSE
+           AIAnwender.Kunden.Field('KndStatus', '1');
+
+       AIAnwender.Kunden.Field('ReferenzNr', ContactG."No.");
+       AIAnwender.Kunden.Update;
+        END;
+        END;
+    END;
+
+    PROCEDURE UpdateReferenceNo@1109400005();
+    VAR
+      CustomerExistsL@1109400001 : Integer;
+    BEGIN
+      // Update Referenz- und Kundennummer
+      IF ContactG."Prospect No." <> '' THEN
+        AIAnwender.Kunden.Field('KndStatus', '2')
+      ELSE
+        AIAnwender.Kunden.Field('KndStatus', '1');
+      AIAnwender.Kunden.Field('ReferenzNr', ContactG."No.");
+      AIAnwender.Kunden.Update;
+      ContactG.GET(ContactG."No.");
+
+      ContactG.MODIFY(TRUE);
+      AIAnwender.Lager.Field('KundenNr', ContactG."Prospect No.");
+      AIAnwender.Lager.Update;
+    END;
+
+    PROCEDURE CheckCustomer@1109400008();
+    BEGIN
+      // PrÅfen ob Kunde in AID vorhanden ist.
+      CustomerExistsG := AIAnwender.FindKunden(7, ContactG."No.");
+      IF CustomerExistsG = -1 THEN
+        AIDCustomerNoG := AIAnwender.Kunden.Field('KundenNr');
+    END;
+
+    BEGIN
+    {
+      +----------------------------------------------+
+      | Copyright (c) 2025 Carya AG                  |
+      +----------------------------------------------+
+      |            INCADEA ENGINE                    |
+      +----------------------------------------------+
+      |PA-Number   Date                              |
+      +----------------------------------------------+
+
+       CLCH045     14.05.2025   HAB   AutoIHandel
+                                Reas: Integration von Auto-I-Handel Datenbank
+                                      Kunden austausch mit Incadea.engine
+                                Othe: neues Objekt
+    }
+    END.
+  }
+}
+
