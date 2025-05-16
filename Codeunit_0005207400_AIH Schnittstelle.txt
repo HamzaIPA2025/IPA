@@ -2,8 +2,8 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
 {
   OBJECT-PROPERTIES
   {
-    Date=15.05.25;
-    Time=16:31:39;
+    Date=16.05.25;
+    Time=17:41:24;
     Modified=Yes;
     Version List=HAB;
   }
@@ -17,15 +17,19 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
           BEGIN
             // DB îffnen
             OpenDB();
-            ContactG.RESET;
-            ContactG.SETCURRENTKEY("Prospect No.");
-            ContactG.SETRANGE("Prospect No.", ContactG."Prospect No.");
-            IF ContactG.FINDSET THEN
-            MESSAGE('GEFUNDEN');
 
-            // Hole den Datensatz von der Contact Card
-            IF ContactG."Prospect No." <> '' THEN BEGIN
-              MESSAGE('Kontakt gefunden: ' + ContactG."No.");
+
+            CASE RecRefL.NUMBER OF
+              DATABASE::Contact:
+                RecRefL.SETTABLE(ContactG);
+            ELSE
+              EXIT;
+            END;
+
+
+            ContactG.GET(RecRefL.FIELD(1));
+
+            IF (ContactG."No." <> '') THEN BEGIN
               CheckCustomer();
               ExpCustData();
             END ELSE BEGIN
@@ -38,7 +42,6 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
             ExportSuccessfullyG := 99;
 
 
-            // RÅckmeldung an Benutzer
             CASE ExportSuccessfullyG OF
               -1: MESSAGE(Text001);
                2: MESSAGE(Text004);
@@ -57,7 +60,6 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
     VAR
       ContactG@1109400004 : Record 5047089;
       AIAnwender@1109400002 : Automation "{74359121-5B44-11D5-A68B-00105A5E4EC4} 1.1:{74359125-5B44-11D5-A68B-00105A5E4EC4}:'Anwender Datenbank DLL'.AnwenderData";
-      VehicleGOption@1109400001 : Record 5025422;
       AddressSalutation@1109400000 : Record 5029133;
       Text001@1109400019 : TextConst 'ENU=Data have been exported successfully.;DES=Daten wurden erfolgreich exportiert.';
       Text002@1109400018 : TextConst 'ENU=Data could not be exported.;DES=Daten konnten nicht exportiert werden.';
@@ -73,7 +75,8 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
       ExportSuccessfullyG@1109400021 : Integer;
       AIDCustomerNoG@1109400022 : Code[10];
       AIDCredentials@1109400023 : Record 5045163;
-      Text011@1109400007 : TextConst 'ENU=Customer not Found.;DES=" Kunde nicht gefunden"';
+      Text011@1109400007 : TextConst 'ENU=Customer not found.;DES=" Kunde nicht gefunden"';
+      Text012@1109400009 : TextConst 'ENU=Customer update canceled;DES=" Kunden Aktualisierung abgebrochen"';
 
     PROCEDURE OpenDB@1109400000() : Boolean;
     VAR
@@ -98,44 +101,6 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
       CLEAR(AIAnwender);
     END;
 
-    LOCAL PROCEDURE PushClient@1000000001();
-    BEGIN
-      AIAnwender.AddKunde('MusterTest');
-      AIAnwender.Kunden.Field('ReferenzNr', '100003');
-      AIAnwender.Kunden.Field('Suchbegriff', 'MUSTER');
-      AIAnwender.Kunden.Field('Vorname', 'Hakim');
-      AIAnwender.Kunden.Field('Adresse1', 'Prof');
-      AIAnwender.Kunden.Field('Adresse2', 'Lystrasse 44');
-      AIAnwender.Kunden.Field('Adresse3', 'Post');
-      AIAnwender.Kunden.Field('PLZ', '2503');
-      AIAnwender.Kunden.Field('Ort', 'Biel/Bienne');
-      AIAnwender.Kunden.Update
-    END;
-
-    PROCEDURE GetClient@1109400001();
-    BEGIN
-
-        // Kunden suchen via ReferenzNr
-        IF AIAnwender.FindKunden(9, ContactG."No.") = -1 THEN BEGIN
-          AIAnwender.Kunden.MoveFirst;
-          ContactG.INIT;
-          ContactG."No." := AIAnwender.Kunden.Field('KundenNr');
-          ContactG."Last Name" := AIAnwender.Kunden.Field('Name');
-          ContactG."First Name" := AIAnwender.Kunden.Field('Vorname');
-          ContactG.Address := AIAnwender.Kunden.Field('Adresse1');
-          ContactG."Address 2" := AIAnwender.Kunden.Field('Adresse2');
-          ContactG.City := AIAnwender.Kunden.Field('Ort');
-          ContactG."Post Code" := AIAnwender.Kunden.Field('PLZ');
-          ContactG."Phone No." := AIAnwender.Kunden.Field('Telefon');
-          ContactG."E-Mail" := AIAnwender.Kunden.Field('Email');
-          ContactG."No." := AIAnwender.Kunden.Field('ReferenzNr');
-          ContactG.INSERT;
-          ContactG.MODIFY;
-          MESSAGE('Kunde erfolgreich von Auto-i importiert.');
-        END ELSE
-          MESSAGE('Kunde mit ReferenzNr 10005 nicht gefunden.');
-    END;
-
     PROCEDURE ExpCustData@1109400003();
     VAR
       CustomerClassL@1109400006 : Text[1];
@@ -154,17 +119,23 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
         IF AddressSalutation."Customer Type" <> ContactG."Customer Type" THEN
           ERROR(Text005);
 
+
       IF CustomerExistsG <> 0 THEN BEGIN
         ConfirmL := DIALOG.CONFIRM(Text003, FALSE);
-        IF NOT ConfirmL THEN
+      IF NOT ConfirmL THEN BEGIN
+          MESSAGE(Text012);
           EXIT;
+        END;
+
         ExportSuccessfullyG := 2;
         AIAnwender.Kunden.Field('Name', ContactG."Last Name");
       END ELSE
         ExportSuccessfullyG := AIAnwender.AddKunde(ContactG."Last Name");
+
+
       // Kundendaten zu AutoIHandel
       // Allgemein
-      AIAnwender.Kunden.Field('ReferenzNr', ContactG."No.");
+      AIAnwender.Kunden.Field('ReferenzNr', ContactG."Prospect No.");
       AIAnwender.Kunden.Field('Suchbegriff', ContactG."Search Name");
       AIAnwender.Kunden.Field('Vorname', ContactG."First Name");
       AIAnwender.Kunden.Field('Adresse1', ContactG."Name 2");
@@ -243,8 +214,7 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
         ELSE
           CustomerClassL := 0;
       END;
-
-      FindQuery1L :=AIAnwender.FindKunden(9, 'ReferenzNr="' + ContactG."No." + '" AND Name ="' + ContactG."Last Name" + '"');
+      FindQuery1L :=AIAnwender.FindKunden(9, 'ReferenzNr="' + ContactG."Prospect No." + '" AND Name ="' + ContactG."Last Name" + '"');
       IF FindQuery1L = 0 THEN
         FindQuery2L :=AIAnwender.FindKunden(9, 'ReferenzNr IS NULL OR ReferenzNr="" AND Name="' + ContactG."Last Name" + '"');
 
@@ -252,7 +222,7 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
        AIAnwender.Kunden.MoveFirst;
         ContactG.INIT;
         REPEAT
-          ContactG."Prospect No." :=AIAnwender.Kunden.Field('KundenNr');
+          ContactG."No." :=AIAnwender.Kunden.Field('KundenNr');
           ContactG."Name 2" :=AIAnwender.Kunden.Field('Suchbegriff');
           ContactG."Address Salutation Code" :=AIAnwender.Kunden.Field('Anrede');
           ContactG."Last Name" := COPYSTR(AIAnwender.Kunden.Field('Name'),1, MAXSTRLEN(ContactG."Last Name"));
@@ -281,7 +251,7 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
           END;
 
           IF FindQuery2L = -1 THEN
-            ContactG."No." :=AIAnwender.Kunden.Field('ReferenzNr');
+           ContactG."Prospect No." :=AIAnwender.Kunden.Field('ReferenzNr');
 
           IF NOT ContactG.MODIFY THEN
             ContactG.INSERT;
@@ -296,7 +266,7 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
           ELSE
            AIAnwender.Kunden.Field('KndStatus', '1');
 
-       AIAnwender.Kunden.Field('ReferenzNr', ContactG."No.");
+       AIAnwender.Kunden.Field('ReferenzNr', ContactG."Prospect No.");
        AIAnwender.Kunden.Update;
         END;
         END;
@@ -307,11 +277,11 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
       CustomerExistsL@1109400001 : Integer;
     BEGIN
       // Update Referenz- und Kundennummer
-      IF ContactG."Prospect No." <> '' THEN
+      IF ContactG."No." <> '' THEN
         AIAnwender.Kunden.Field('KndStatus', '2')
       ELSE
         AIAnwender.Kunden.Field('KndStatus', '1');
-      AIAnwender.Kunden.Field('ReferenzNr', ContactG."No.");
+      AIAnwender.Kunden.Field('ReferenzNr', ContactG."Prospect No.");
       AIAnwender.Kunden.Update;
       ContactG.GET(ContactG."No.");
 
@@ -323,7 +293,7 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
     PROCEDURE CheckCustomer@1109400008();
     BEGIN
       // PrÅfen ob Kunde in AID vorhanden ist.
-      CustomerExistsG := AIAnwender.FindKunden(7, ContactG."No.");
+      CustomerExistsG := AIAnwender.FindKunden(7, ContactG."Prospect No.");
       IF CustomerExistsG = -1 THEN
         AIDCustomerNoG := AIAnwender.Kunden.Field('KundenNr');
     END;
