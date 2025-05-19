@@ -1,0 +1,536 @@
+OBJECT Form 5047077 Contact Card
+{
+  OBJECT-PROPERTIES
+  {
+    Date=19.05.25;
+    Time=08:09:22;
+    Modified=Yes;
+    Version List=HAB;
+  }
+  PROPERTIES
+  {
+    Width=16170;
+    Height=8800;
+    CaptionML=[ENU=Contact Card;
+               DES=Kontaktperson Karte;
+               ITS=Scheda Contatto;
+               FRS=Fiche Contact];
+    SourceTable=Table5047089;
+    DataCaptionExpr=Caption;
+    UpdateOnActivate=Yes;
+    OnAfterGetRecord=BEGIN
+                       SETRANGE("No.");
+                     END;
+
+    OnAfterGetCurrRecord=BEGIN
+                           CALCFIELDS("Prospect Name");
+                         END;
+
+    OnModifyRecord=VAR
+                     LastNameFormLoc@1109400000 : Form 5025369;
+                   BEGIN
+                     //INC2.00
+                     IF "Last Name" = '' THEN BEGIN
+                       LastNameFormLoc.Contact(Rec);
+                       LastNameFormLoc.LOOKUPMODE(TRUE);
+                       IF LastNameFormLoc.RUNMODAL = ACTION::LookupOK THEN
+                         VALIDATE("Last Name",LastNameFormLoc.GetLastName());
+                     END;
+                     //INC2.30 START
+                     IF "Address No." = 0 THEN
+                       AddressManagement.CheckContactAddress(Rec, TRUE);
+                     //INC2.30 STOP
+                     EXIT (TRUE);
+                     //INC2.00
+                   END;
+
+  }
+  CONTROLS
+  {
+    { 1   ;TabControl   ;220  ;220  ;15730;7590 ;HorzGlue=Both;
+                                                 VertGlue=Both;
+                                                 PageNamesML=[ENU=General,Communication,Segmentation,Free,Statistic;
+                                                              DES=Allgemein,Kommunikation,Bereich,Frei,Statistik;
+                                                              ITS=Generale,Comunicazione,Segmentazione,Libero,Statistico;
+                                                              FRS=G n ral,Communication,Segments,Libre,Statistique] }
+    { 18  ;TextBox      ;3850 ;4840 ;5500 ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="Address 2" }
+    { 19  ;Label        ;440  ;4840 ;3300 ;440  ;ParentControl=18 }
+    { 20  ;TextBox      ;3850 ;5390 ;2750 ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 NextControl=22;
+                                                 SourceExpr="Post Code" }
+    { 21  ;Label        ;440  ;5390 ;3300 ;440  ;ParentControl=20;
+                                                 CaptionML=[ENU=Post Code/City;
+                                                            DES=PLZ Code/Ort;
+                                                            ITS=CAP/Citt ;
+                                                            FRS=CP/Ville] }
+    { 22  ;TextBox      ;6710 ;5390 ;2640 ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 NextControl=23;
+                                                 SourceExpr=City }
+    { 24  ;TextBox      ;12980;990  ;2750 ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="Search Name" }
+    { 25  ;Label        ;9570 ;990  ;3300 ;440  ;ParentControl=24 }
+    { 23  ;TextBox      ;3850 ;5940 ;2750 ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="Country Code" }
+    { 26  ;Label        ;440  ;5940 ;3300 ;440  ;ParentControl=23 }
+    { 33  ;PictureBox   ;6710 ;990  ;440  ;440  ;Focusable=No;
+                                                 ParentControl=1;
+                                                 InPage=0;
+                                                 ShowCaption=No;
+                                                 Border=No;
+                                                 BitmapPos=Center;
+                                                 BitmapList=7,6;
+                                                 SourceExpr=Comment }
+    { 34  ;CommandButton;6710 ;990  ;440  ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 ShowCaption=No;
+                                                 BackTransparent=Yes;
+                                                 PushAction=RunObject;
+                                                 ToolTipML=[ENU=Comment;
+                                                            DES=Bemerkung;
+                                                            ITS=Commento;
+                                                            FRS=Commentaire];
+                                                 RunObject=Form 5047084;
+                                                 RunFormLinkType=OnUpdate;
+                                                 RunFormLink=Table Name=CONST(Contact),
+                                                             Prospect No.=FIELD(Prospect No.),
+                                                             Table Code=FIELD(No.) }
+    { 37  ;TextBox      ;12980;4400 ;1650 ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="Next Activity Date" }
+    { 38  ;Label        ;9570 ;4400 ;3300 ;440  ;ParentControl=37 }
+    { 35  ;TextBox      ;12980;3850 ;1650 ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="Last Activity Date" }
+    { 36  ;Label        ;9570 ;3850 ;3300 ;440  ;ParentControl=35 }
+    { 31  ;TextBox      ;12980;2200 ;1650 ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="Last Date Modified" }
+    { 32  ;Label        ;9570 ;2200 ;3300 ;440  ;ParentControl=31 }
+    { 2   ;TextBox      ;3850 ;990  ;2750 ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="Prospect No." }
+    { 3   ;Label        ;440  ;990  ;3300 ;440  ;ParentControl=2 }
+    { 52  ;TextBox      ;3850 ;1540 ;2750 ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="No." }
+    { 53  ;Label        ;440  ;1540 ;3300 ;440  ;ParentControl=52 }
+    { 6   ;CheckBox     ;12980;3300 ;440  ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 ShowCaption=No;
+                                                 SourceExpr="Use Contact Address" }
+    { 12  ;Label        ;9570 ;3300 ;3300 ;440  ;ParentControl=6 }
+    { 13  ;TextBox      ;12980;1650 ;2750 ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="Salesperson Code" }
+    { 57  ;Label        ;9570 ;1650 ;3300 ;440  ;ParentControl=13 }
+    { 62  ;CheckBox     ;12980;2750 ;440  ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 ShowCaption=No;
+                                                 SourceExpr="Include in Campaigns" }
+    { 63  ;Label        ;9570 ;2750 ;3300 ;440  ;ParentControl=62 }
+    { 14  ;TextBox      ;3850 ;3740 ;5500 ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="Last Name" }
+    { 15  ;Label        ;440  ;3740 ;3300 ;440  ;ParentControl=14 }
+    { 72  ;TextBox      ;3850 ;3190 ;5500 ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="First Name" }
+    { 73  ;Label        ;440  ;3190 ;3300 ;440  ;ParentControl=72 }
+    { 9   ;TextBox      ;3850 ;2090 ;2750 ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="Address Salutation Code" }
+    { 10  ;Label        ;440  ;2090 ;3300 ;440  ;ParentControl=9 }
+    { 65  ;TextBox      ;3850 ;6490 ;2750 ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="Letter Salutation Code" }
+    { 70  ;Label        ;440  ;6490 ;3300 ;440  ;ParentControl=65 }
+    { 76  ;TextBox      ;3850 ;2640 ;2750 ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="Title Code" }
+    { 77  ;Label        ;440  ;2640 ;3300 ;440  ;ParentControl=76 }
+    { 78  ;TextBox      ;12980;5500 ;2750 ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="Customer Type" }
+    { 79  ;Label        ;9570 ;5500 ;3300 ;440  ;ParentControl=78 }
+    { 5   ;TextBox      ;12980;4950 ;2750 ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 SourceExpr="Employee Function Code" }
+    { 7   ;Label        ;9570 ;4950 ;3300 ;440  ;ParentControl=5 }
+    { 1117700000;TextBox;8470 ;4290 ;880  ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 NextControl=18;
+                                                 SourceExpr="House No." }
+    { 1117700002;TextBox;3850 ;4290 ;4510 ;440  ;ParentControl=1;
+                                                 InPage=0;
+                                                 NextControl=1117700000;
+                                                 SourceExpr=Street }
+    { 1117700001;Label  ;440  ;4290 ;3300 ;440  ;ParentControl=1117700002;
+                                                 CaptionML=[ENU=Street / House No.;
+                                                            DES=Stra e / Hausnr.;
+                                                            ITS=Indirizzo / No. Civico;
+                                                            FRS=Rue / N  domic.];
+                                                 Description=PA022459.BMW }
+    { 27  ;TextBox      ;3850 ;990  ;4950 ;440  ;ParentControl=1;
+                                                 InPage=1;
+                                                 SourceExpr="Phone No." }
+    { 28  ;Label        ;440  ;990  ;3300 ;440  ;ParentControl=27 }
+    { 29  ;TextBox      ;3850 ;1540 ;4950 ;440  ;ParentControl=1;
+                                                 InPage=1;
+                                                 SourceExpr="Fax No." }
+    { 30  ;Label        ;440  ;1540 ;3300 ;440  ;ParentControl=29 }
+    { 54  ;TextBox      ;3850 ;2640 ;4950 ;440  ;ParentControl=1;
+                                                 InPage=1;
+                                                 SourceExpr="E-Mail" }
+    { 55  ;Label        ;440  ;2640 ;3300 ;440  ;ParentControl=54 }
+    { 58  ;TextBox      ;3850 ;2090 ;4950 ;440  ;ParentControl=1;
+                                                 InPage=1;
+                                                 SourceExpr="Mobile Phone No." }
+    { 59  ;Label        ;440  ;2090 ;3300 ;440  ;ParentControl=58 }
+    { 71  ;CommandButton;8910 ;2640 ;440  ;440  ;ParentControl=1;
+                                                 InPage=1;
+                                                 ShowCaption=No;
+                                                 Bitmap=21;
+                                                 ToolTipML=[ENU=New Message;
+                                                            DES=Neue Nachricht;
+                                                            ITS=Nuovo Messaggio;
+                                                            FRS=Nouveau Message];
+                                                 OnPush=BEGIN
+                                                          Mail.OpenNewMessage("E-Mail");
+                                                        END;
+                                                         }
+    { 82  ;TextBox      ;3850 ;4290 ;4950 ;440  ;ParentControl=1;
+                                                 InPage=1;
+                                                 SourceExpr="Home Phone No." }
+    { 83  ;Label        ;440  ;4290 ;3300 ;440  ;ParentControl=82 }
+    { 84  ;TextBox      ;3850 ;3190 ;4950 ;440  ;ParentControl=1;
+                                                 InPage=1;
+                                                 SourceExpr="Home Page" }
+    { 85  ;Label        ;440  ;3190 ;3300 ;440  ;ParentControl=84 }
+    { 86  ;TextBox      ;3850 ;4840 ;4950 ;440  ;ParentControl=1;
+                                                 InPage=1;
+                                                 SourceExpr="Home Fax No." }
+    { 87  ;Label        ;440  ;4840 ;3300 ;440  ;ParentControl=86 }
+    { 88  ;TextBox      ;3850 ;5390 ;4950 ;440  ;ParentControl=1;
+                                                 InPage=1;
+                                                 SourceExpr="Home Mobile Phone No." }
+    { 89  ;Label        ;440  ;5390 ;3300 ;440  ;ParentControl=88 }
+    { 90  ;TextBox      ;3850 ;5940 ;4950 ;440  ;ParentControl=1;
+                                                 InPage=1;
+                                                 SourceExpr="Home E-Mail" }
+    { 91  ;Label        ;440  ;5940 ;3300 ;440  ;ParentControl=90 }
+    { 92  ;TextBox      ;3850 ;6490 ;4950 ;440  ;ParentControl=1;
+                                                 InPage=1;
+                                                 SourceExpr="Home Page 2" }
+    { 93  ;Label        ;440  ;6490 ;3300 ;440  ;ParentControl=92 }
+    { 94  ;CommandButton;8910 ;3190 ;440  ;440  ;ParentControl=1;
+                                                 InPage=1;
+                                                 ShowCaption=No;
+                                                 Bitmap=20;
+                                                 ToolTipML=[ENU=Hyperlink;
+                                                            DES=Hyperlink;
+                                                            ITS=Hyperlink;
+                                                            FRS=Hyperlien];
+                                                 OnPush=BEGIN
+                                                          TESTFIELD("Home Page");
+                                                          HYPERLINK("Home Page");
+                                                        END;
+                                                         }
+    { 95  ;CommandButton;8910 ;6490 ;440  ;440  ;ParentControl=1;
+                                                 InPage=1;
+                                                 ShowCaption=No;
+                                                 Bitmap=20;
+                                                 ToolTipML=[ENU=Hyperlink;
+                                                            DES=Hyperlink;
+                                                            ITS=Hyperlink;
+                                                            FRS=Hyperlien];
+                                                 OnPush=BEGIN
+                                                          TESTFIELD("Home Page 2");
+                                                          HYPERLINK("Home Page 2");
+                                                        END;
+                                                         }
+    { 96  ;CommandButton;8910 ;5940 ;440  ;440  ;ParentControl=1;
+                                                 InPage=1;
+                                                 ShowCaption=No;
+                                                 Bitmap=21;
+                                                 ToolTipML=[ENU=New Message;
+                                                            DES=Neue Nachricht;
+                                                            ITS=Nuovo Messaggio;
+                                                            FRS=Nouveau Message];
+                                                 OnPush=BEGIN
+                                                          Mail.OpenNewMessage("Home E-Mail");
+                                                        END;
+                                                         }
+    { 43  ;CheckBox     ;3850 ;2090 ;440  ;440  ;ParentControl=1;
+                                                 InPage=2;
+                                                 ShowCaption=No;
+                                                 SourceExpr="Primary Contact" }
+    { 44  ;Label        ;440  ;2090 ;3300 ;440  ;ParentControl=43 }
+    { 45  ;CheckBox     ;3850 ;2640 ;440  ;440  ;ParentControl=1;
+                                                 InPage=2;
+                                                 ShowCaption=No;
+                                                 SourceExpr="Market Groups" }
+    { 46  ;Label        ;440  ;2640 ;3300 ;440  ;ParentControl=45 }
+    { 41  ;TextBox      ;3850 ;1540 ;2750 ;440  ;ParentControl=1;
+                                                 InPage=2;
+                                                 SourceExpr="Responsibility Level" }
+    { 42  ;Label        ;440  ;1540 ;3300 ;440  ;ParentControl=41 }
+    { 39  ;TextBox      ;3850 ;990  ;2750 ;440  ;ParentControl=1;
+                                                 InPage=2;
+                                                 SourceExpr="Job Responsibility Code" }
+    { 40  ;Label        ;440  ;990  ;3300 ;440  ;ParentControl=39 }
+    { 97  ;TextBox      ;3850 ;990  ;1650 ;440  ;ParentControl=1;
+                                                 InPage=3;
+                                                 SourceExpr="Date 1" }
+    { 98  ;Label        ;440  ;990  ;3300 ;440  ;ParentControl=97 }
+    { 99  ;TextBox      ;3850 ;1540 ;1650 ;440  ;ParentControl=1;
+                                                 InPage=3;
+                                                 SourceExpr="Date 2" }
+    { 100 ;Label        ;440  ;1540 ;3300 ;440  ;ParentControl=99 }
+    { 101 ;TextBox      ;3850 ;2090 ;2750 ;440  ;ParentControl=1;
+                                                 InPage=3;
+                                                 SourceExpr="Extra Code 1" }
+    { 102 ;Label        ;440  ;2090 ;3300 ;440  ;ParentControl=101 }
+    { 103 ;TextBox      ;3850 ;2640 ;2750 ;440  ;ParentControl=1;
+                                                 InPage=3;
+                                                 SourceExpr="Extra Code 2" }
+    { 104 ;Label        ;440  ;2640 ;3300 ;440  ;ParentControl=103 }
+    { 105 ;TextBox      ;3850 ;3190 ;2750 ;440  ;ParentControl=1;
+                                                 InPage=3;
+                                                 SourceExpr="Extra Code 3" }
+    { 106 ;Label        ;440  ;3190 ;3300 ;440  ;ParentControl=105 }
+    { 107 ;TextBox      ;3850 ;3740 ;5500 ;440  ;ParentControl=1;
+                                                 InPage=3;
+                                                 SourceExpr="Text 1" }
+    { 108 ;Label        ;440  ;3740 ;3300 ;440  ;ParentControl=107 }
+    { 109 ;TextBox      ;3850 ;4290 ;5500 ;440  ;ParentControl=1;
+                                                 InPage=3;
+                                                 SourceExpr="Text 2" }
+    { 110 ;Label        ;440  ;4290 ;3300 ;440  ;ParentControl=109 }
+    { 111 ;TextBox      ;3850 ;4840 ;5500 ;440  ;ParentControl=1;
+                                                 InPage=3;
+                                                 SourceExpr="Text 3" }
+    { 112 ;Label        ;440  ;4840 ;3300 ;440  ;ParentControl=111 }
+    { 113 ;TextBox      ;3850 ;5390 ;5500 ;440  ;ParentControl=1;
+                                                 InPage=3;
+                                                 SourceExpr="Text 4" }
+    { 114 ;Label        ;440  ;5390 ;3300 ;440  ;ParentControl=113 }
+    { 115 ;TextBox      ;3850 ;5940 ;5500 ;440  ;ParentControl=1;
+                                                 InPage=3;
+                                                 SourceExpr="Text 5" }
+    { 116 ;Label        ;440  ;5940 ;3300 ;440  ;ParentControl=115 }
+    { 117 ;TextBox      ;3850 ;6490 ;5500 ;440  ;ParentControl=1;
+                                                 InPage=3;
+                                                 SourceExpr="Text 6" }
+    { 118 ;Label        ;440  ;6490 ;3300 ;440  ;ParentControl=117 }
+    { 1117700003;TextBox;12980;2640 ;2750 ;440  ;ParentControl=1;
+                                                 InPage=4;
+                                                 SourceExpr="Updated by User ID" }
+    { 1117700004;Label  ;9570 ;2640 ;3300 ;440  ;ParentControl=1117700003 }
+    { 1117700005;TextBox;12980;2090 ;1650 ;440  ;ParentControl=1;
+                                                 InPage=4;
+                                                 SourceExpr="Date of Update" }
+    { 1117700006;Label  ;9570 ;2090 ;3300 ;440  ;ParentControl=1117700005 }
+    { 1117700007;TextBox;12980;1540 ;2750 ;440  ;ParentControl=1;
+                                                 InPage=4;
+                                                 SourceExpr="Angelegt von" }
+    { 1117700008;Label  ;9570 ;1540 ;3300 ;440  ;ParentControl=1117700007 }
+    { 1117700009;TextBox;12980;990  ;1650 ;440  ;ParentControl=1;
+                                                 InPage=4;
+                                                 SourceExpr="Angelegt am" }
+    { 1117700010;Label  ;9570 ;990  ;3300 ;440  ;ParentControl=1117700009 }
+    { 1117700011;TextBox;3850 ;990  ;1650 ;440  ;ParentControl=1;
+                                                 InPage=4;
+                                                 SourceExpr=Geburtsdatum }
+    { 1117700012;Label  ;440  ;990  ;3300 ;440  ;ParentControl=1117700011 }
+    { 4   ;CommandButton;13750;8030 ;2200 ;550  ;HorzGlue=Right;
+                                                 VertGlue=Bottom;
+                                                 PushAction=FormHelp }
+    { 8   ;MenuButton   ;8910 ;8030 ;2200 ;550  ;HorzGlue=Right;
+                                                 VertGlue=Bottom;
+                                                 CaptionML=[ENU=C&ontact;
+                                                            DES=Ko&ntaktperson;
+                                                            ITS=C&ontatto;
+                                                            FRS=&Contact];
+                                                 Menu=MENUITEMS
+                                                 {
+                                                   { ID=47;
+                                                     PushAction=LookupTable;
+                                                     ShortCutKey=F5;
+                                                     CaptionML=[ENU=&List;
+                                                                DES= bersic&ht;
+                                                                ITS=E&lenco;
+                                                                FRS=&Lister] }
+                                                   { ID=56;
+                                                     PushAction=RunObject;
+                                                     CaptionML=[ENU=P&rospect;
+                                                                DES=&Interessent;
+                                                                ITS=&Interessato;
+                                                                FRS=Pr&ospect];
+                                                     RunObject=Form 5047074;
+                                                     RunFormLinkType=OnUpdate;
+                                                     RunFormLink=No.=FIELD(Prospect No.) }
+                                                   { ID=48;
+                                                     PushAction=RunObject;
+                                                     CaptionML=[ENU=Market &Groups;
+                                                                DES=In&teressengruppen;
+                                                                ITS=Gruppi mercato;
+                                                                FRS=Groupes march s];
+                                                     RunObject=Form 5047093;
+                                                     RunFormLinkType=OnUpdate;
+                                                     RunFormLink=Prospect No.=FIELD(Prospect No.),
+                                                                 Contact No.=FIELD(No.) }
+                                                   { ID=50;
+                                                     PushAction=RunObject;
+                                                     CaptionML=[ENU=Co&mments;
+                                                                DES=Be&merkungen;
+                                                                ITS=C&ommenti;
+                                                                FRS=Co&mmentaires];
+                                                     RunObject=Form 5047084;
+                                                     RunFormLinkType=OnUpdate;
+                                                     RunFormLink=Table Name=CONST(Contact),
+                                                                 Prospect No.=FIELD(Prospect No.),
+                                                                 Table Code=FIELD(No.) }
+                                                   { ID=66;
+                                                     PushAction=RunObject;
+                                                     CaptionML=[ENU=&Picture;
+                                                                DES=Bild;
+                                                                ITS=&Immagine;
+                                                                FRS=&Image];
+                                                     RunObject=Form 5047073;
+                                                     RunFormLinkType=OnUpdate;
+                                                     RunFormLink=Prospect No.=FIELD(Prospect No.),
+                                                                 No.=FIELD(No.) }
+                                                   { ID=49;
+                                                     PushAction=RunObject;
+                                                     ShortCutKey=Ctrl+F5;
+                                                     CaptionML=[ENU=Act&ivities;
+                                                                DES=Aktionen;
+                                                                ITS=A&ttivit ;
+                                                                FRS=&Actions];
+                                                     RunObject=Form 5047087;
+                                                     RunFormLinkType=OnUpdate;
+                                                     RunFormView=SORTING(Prospect No.,Contact No.,Date,Time Created);
+                                                     RunFormLink=Prospect No.=FIELD(Prospect No.),
+                                                                 Contact No.=FIELD(No.) }
+                                                 }
+                                                  }
+    { 64  ;MenuButton   ;11330;8030 ;2200 ;550  ;HorzGlue=Right;
+                                                 VertGlue=Bottom;
+                                                 CaptionML=[ENU=F&unctions;
+                                                            DES=F&unktion;
+                                                            ITS=F&unzioni;
+                                                            FRS=&Fonctions];
+                                                 Menu=MENUITEMS
+                                                 {
+                                                   { ID=67;
+                                                     Ellipsis=Yes;
+                                                     CaptionML=[ENU=Print Cover &Sheet;
+                                                                DES=Kurzbrief d&rucken;
+                                                                ITS=&Stampa copertina;
+                                                                FRS=Imprimer &bordereau d'envoi];
+                                                     OnPush=BEGIN
+                                                              //ORIG
+                                                              {
+                                                              Cont := Rec;
+                                                              Cont.SETRECFILTER;
+                                                              REPORT.RUN(REPORT::Kurzbrief,TRUE,FALSE,Cont);
+                                                              }
+
+                                                              //SS48
+                                                              CLEAR(Kurzbrief);
+                                                              Kurzbrief.AbsenderDef(Rec);
+                                                              Kurzbrief.RUN;
+                                                            END;
+                                                             }
+                                                   { ID=69;
+                                                     MenuItemType=Separator }
+                                                   { ID=68;
+                                                     Ellipsis=Yes;
+                                                     CaptionML=[ENU=Create &Recurring Activity;
+                                                                DES=Wiederkehrende Aktion erstellen;
+                                                                ITS=Crea attivit  &ricorrente;
+                                                                FRS=Cr er Actions p riodiques];
+                                                     OnPush=BEGIN
+                                                              CLEAR(CreateRecurringActivity);
+                                                              CreateRecurringActivity.SetContact(Rec);
+                                                              CreateRecurringActivity.RUNMODAL;
+                                                            END;
+                                                             }
+                                                   { ID=1109400002;
+                                                     MenuItemType=Separator }
+                                                   { ID=1109400000;
+                                                     CaptionML=[ENU=AutoIHandel;
+                                                                DES=An AutoIHandel senden];
+                                                     RunFormOnRec=Yes;
+                                                     OnPush=BEGIN
+                                                              GET(Rec);
+                                                            END;
+                                                             }
+                                                   { ID=1109400001;
+                                                     MenuLevel=1;
+                                                     CaptionML=ENU=Senden;
+                                                     OnPush=BEGIN
+                                                              Cont := Rec; // Cont ist Contact-Record im Formular
+                                                              Cont.SETRECFILTER;
+                                                              MyCodeunitG.StartExport(Cont);
+                                                            END;
+                                                             }
+                                                   { ID=1109400003;
+                                                     MenuLevel=1;
+                                                     CaptionML=ENU=Empfangen;
+                                                     OnPush=BEGIN
+                                                              Cont := Rec; // Cont ist Contact-Record im Formular
+                                                              Cont.SETRECFILTER;
+                                                              MyCodeunitG.StartImport(Cont);
+                                                            END;
+                                                             }
+                                                 }
+                                                  }
+  }
+  CODE
+  {
+    VAR
+      Cont@1109400000 : Record 5047089;
+      CreateRecurringActivity@1109400001 : Report 5047094;
+      Mail@1109400002 : Codeunit 397;
+      _INCADEA_@1109400003 : Boolean;
+      AddressManagement@1109400004 : Codeunit 5029101;
+      _NSCH_@1117700000 : Integer;
+      Kurzbrief@1117700001 : Report 5047078;
+      MyCodeunitG@1109400005 : Codeunit 5207400;
+
+    BEGIN
+    {
+      NSCH ------------------------------------------+
+      SS48
+      01.04.00/NSCH/CH - Felder neu angeordnet                                      //TL  nderung nicht  bernommen
+      06.11.00/NSCH/CH - Property InsertAllowed auf Ja gestellt
+      08.05.01/NSCH/CH - Men  Funktion, Kurzbrief drucken: Reportaufruf ge ndert
+
+      +----------------------------------------------+
+      | Copyright (c) 2010 Incadea GmbH              |
+      +----------------------------------------------+
+      | INCADEA ENGINE                               |
+      +----------------------------------------------+
+      PA-Number  Date
+      -----------------------------------------------+
+      PA031554   08.04.10  (BRL): Object renumbering changes due to Microsoft Agreement.
+
+
+      --- BMW ---
+      PA022459.BMW 03.02.04 md Anzeige der neuen Felder "Stra e" & "Hausnummer" anstelle des Feldes "Adresse"
+      PA031554.BMW 13.01.10  Object renumbering changes due to Microsoft Agreement.
+
+      --- HAB ---
+      CLCH HAB 15.05.2025 Neue Funktionen erstellt AutoIHandel Senden und Empfangen
+    }
+    END.
+  }
+}
+

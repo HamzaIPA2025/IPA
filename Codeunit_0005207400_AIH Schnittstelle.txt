@@ -2,8 +2,8 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
 {
   OBJECT-PROPERTIES
   {
-    Date=16.05.25;
-    Time=17:41:24;
+    Date=19.05.25;
+    Time=16:16:23;
     Modified=Yes;
     Version List=HAB;
   }
@@ -15,43 +15,6 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
             TypeL@1109400001 : 'InitParam,GetParam';
             OpenL@1109400000 : Boolean;
           BEGIN
-            // DB ”ffnen
-            OpenDB();
-
-
-            CASE RecRefL.NUMBER OF
-              DATABASE::Contact:
-                RecRefL.SETTABLE(ContactG);
-            ELSE
-              EXIT;
-            END;
-
-
-            ContactG.GET(RecRefL.FIELD(1));
-
-            IF (ContactG."No." <> '') THEN BEGIN
-              CheckCustomer();
-              ExpCustData();
-            END ELSE BEGIN
-              // Falls kein Kontakt gefunden wurde
-                MESSAGE(Text011);
-            END;
-
-
-            CustomerExistsG := 99;
-            ExportSuccessfullyG := 99;
-
-
-            CASE ExportSuccessfullyG OF
-              -1: MESSAGE(Text001);
-               2: MESSAGE(Text004);
-               3: ;
-              ELSE
-                MESSAGE(Text002);
-            END;
-
-            // DB Schliessen
-            CloseDb();
           END;
 
   }
@@ -77,6 +40,75 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
       AIDCredentials@1109400023 : Record 5045163;
       Text011@1109400007 : TextConst 'ENU=Customer not found.;DES=" Kunde nicht gefunden"';
       Text012@1109400009 : TextConst 'ENU=Customer update canceled;DES=" Kunden Aktualisierung abgebrochen"';
+      Text013@1109400001 : TextConst 'ENU=No matching customer found.;DES=Kein passender Kunde gefunden.';
+      AIHContactTempG@1109400010 : Record 5045160;
+
+    PROCEDURE StartExport@1109400006(ContactP@1109400000 : Record 5047089);
+    BEGIN
+      ContactG := ContactP;
+      HauptprozessExport();
+    END;
+
+    PROCEDURE StartImport@1109400004(ContactP@1109400000 : Record 5047089);
+    BEGIN
+      ContactG := ContactP;
+      HauptprozessImport();
+    END;
+
+    PROCEDURE HauptprozessExport@1109400001();
+    VAR
+      RecRefL@1109400003 : RecordRef;
+      ActionTypeL@1109400002 : 'Launch,Send,Receive,Cockpit Functions,Show,Process,Close,Delete,Log Entry,Batch Close,Batch Delete';
+      TypeL@1109400001 : 'InitParam,GetParam';
+      OpenL@1109400000 : Boolean;
+    BEGIN
+      // DB ”ffnen
+      OpenDB();
+
+      IF (ContactG."No." <> '') THEN BEGIN
+        CheckCustomer();
+        ExpCustData();
+      END ELSE BEGIN
+        // Falls kein Kontakt gefunden wurde
+          MESSAGE(Text011);
+      END;
+
+
+
+      CASE ExportSuccessfullyG OF
+        -1: MESSAGE(Text001);
+         2: MESSAGE(Text004);
+         3: ;
+        ELSE
+          MESSAGE(Text002);
+      END;
+
+      // DB Schliessen
+      CloseDb();
+    END;
+
+    PROCEDURE HauptprozessImport@1109400009();
+    VAR
+      RecRefL@1109400003 : RecordRef;
+      ActionTypeL@1109400002 : 'Launch,Send,Receive,Cockpit Functions,Show,Process,Close,Delete,Log Entry,Batch Close,Batch Delete';
+      TypeL@1109400001 : 'InitParam,GetParam';
+      OpenL@1109400000 : Boolean;
+    BEGIN
+      // DB ”ffnen
+      OpenDB();
+
+      IF (ContactG."No." <> '') THEN BEGIN
+        CheckCustomer();
+        ImpCustData();
+      END ELSE BEGIN
+        // Falls kein Kontakt gefunden wurde
+          MESSAGE(Text011);
+      END;
+
+
+      // DB Schliessen
+      CloseDb();
+    END;
 
     PROCEDURE OpenDB@1109400000() : Boolean;
     VAR
@@ -220,56 +252,69 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
 
       IF (FindQuery1L = -1) OR (FindQuery2L = -1) THEN BEGIN
        AIAnwender.Kunden.MoveFirst;
-        ContactG.INIT;
+        AIHContactTempG.INIT;
         REPEAT
-          ContactG."No." :=AIAnwender.Kunden.Field('KundenNr');
-          ContactG."Name 2" :=AIAnwender.Kunden.Field('Suchbegriff');
-          ContactG."Address Salutation Code" :=AIAnwender.Kunden.Field('Anrede');
-          ContactG."Last Name" := COPYSTR(AIAnwender.Kunden.Field('Name'),1, MAXSTRLEN(ContactG."Last Name"));
-          ContactG."First Name" :=AIAnwender.Kunden.Field('Vorname');
-          ContactG.Address :=AIAnwender.Kunden.Field('Adresse1');
-          ContactG."Address 2" :=AIAnwender.Kunden.Field('Adresse2');
-          ContactG.City :=AIAnwender.Kunden.Field('Adresse3');
-          ContactG."Post Code" :=AIAnwender.Kunden.Field('PLZ');
-          ContactG."Phone No." :=AIAnwender.Kunden.Field('Telefon Nr.');
-          ContactG."Country Code" :=AIAnwender.Kunden.Field('Land');
+          AIHContactTempG."Prospect No." :=AIAnwender.Kunden.Field('KundenNr');
+          AIHContactTempG."Name 2" :=AIAnwender.Kunden.Field('Suchbegriff');
+          AIHContactTempG."Address Salutation Code" :=AIAnwender.Kunden.Field('Anrede');
+          AIHContactTempG."Last Name" := COPYSTR(AIAnwender.Kunden.Field('Name'),1, MAXSTRLEN(AIHContactTempG."Last Name"));
+          AIHContactTempG."First Name" :=AIAnwender.Kunden.Field('Vorname');
+          AIHContactTempG.Address :=AIAnwender.Kunden.Field('Adresse1');
+          AIHContactTempG."Address 2" :=AIAnwender.Kunden.Field('Adresse2');
+          AIHContactTempG.City :=AIAnwender.Kunden.Field('Adresse3');
+          AIHContactTempG."Post Code" :=AIAnwender.Kunden.Field('PLZ');
+          AIHContactTempG."Phone No." :=AIAnwender.Kunden.Field('Telefon Nr.');
+          AIHContactTempG."Country Code" :=AIAnwender.Kunden.Field('Land');
 
           IF CustomerClassL = 2 THEN BEGIN
-            ContactG."Fax No." :=AIAnwender.Kunden.Field('Telefon');
-            ContactG."Mobile Phone No." :=AIAnwender.Kunden.Field('Natel');
-            ContactG."Fax No." :=AIAnwender.Kunden.Field('Fax');
-            ContactG."E-Mail" :=AIAnwender.Kunden.Field('Email');
+            AIHContactTempG."Fax No." :=AIAnwender.Kunden.Field('Telefon');
+            AIHContactTempG."Mobile Phone No." :=AIAnwender.Kunden.Field('Natel');
+            AIHContactTempG."Fax No." :=AIAnwender.Kunden.Field('Fax');
+            AIHContactTempG."E-Mail" :=AIAnwender.Kunden.Field('Email');
           END ELSE BEGIN
-            ContactG."Home Phone No." :=AIAnwender.Kunden.Field('Telefon');
-            ContactG."Home Mobile Phone No." :=AIAnwender.Kunden.Field('Natel');
-            ContactG."Home Fax No." :=AIAnwender.Kunden.Field('Fax');
-            ContactG."Home E-Mail" :=AIAnwender.Kunden.Field('EMail');
-            ContactG."Fax No." :=AIAnwender.Kunden.Field('GTelefon');
-            ContactG."Mobile Phone No." :=AIAnwender.Kunden.Field('GDirekt');
-            ContactG."Fax No." :=AIAnwender.Kunden.Field('GFax');
-            ContactG."E-Mail" :=AIAnwender.Kunden.Field('GEMail');
+            AIHContactTempG."Home Phone No." :=AIAnwender.Kunden.Field('Telefon');
+            AIHContactTempG."Home Mobile Phone No." :=AIAnwender.Kunden.Field('Natel');
+            AIHContactTempG."Home Fax No." :=AIAnwender.Kunden.Field('Fax');
+            AIHContactTempG."Home E-Mail" :=AIAnwender.Kunden.Field('EMail');
+            AIHContactTempG."Fax No." :=AIAnwender.Kunden.Field('GTelefon');
+            AIHContactTempG."Mobile Phone No." :=AIAnwender.Kunden.Field('GDirekt');
+            AIHContactTempG."Fax No." :=AIAnwender.Kunden.Field('GFax');
+            AIHContactTempG."E-Mail" :=AIAnwender.Kunden.Field('GEMail');
           END;
 
-          IF FindQuery2L = -1 THEN
-           ContactG."Prospect No." :=AIAnwender.Kunden.Field('ReferenzNr');
+      IF FindQuery2L = -1 THEN
+            AIHContactTempG."Prospect No." := ContactG."Prospect No."
+          ELSE
+            AIHContactTempG."Prospect No." := AIAnwender.Kunden.Field('ReferenzNr');
 
-          IF NOT ContactG.MODIFY THEN
-            ContactG.INSERT;
+          IF NOT AIHContactTempG.MODIFY THEN
+             AIHContactTempG.INSERT;
 
          AIAnwender.Kunden.MoveNext;
 
-        UNTIL
-        AIAnwender.Kunden.EOF = -1;  FindQuery3L :=AIAnwender.FindKunden(1, ContactG."No.");
+        UNTIL AIAnwender.Kunden.EOF = -1;
+
+        COMMIT;
+
+        FORM.RUNMODAL(5045160, AIHContactTempG);
+
+
+
+      FindQuery3L := AIAnwender.FindKunden(1, ContactG."Prospect No.");
         IF FindQuery3L = -1 THEN BEGIN
           IF ContactG."No." <> '' THEN
-           AIAnwender.Kunden.Field('KndStatus', '2')
+            AIAnwender.Kunden.Field('KndStatus', '2')
           ELSE
-           AIAnwender.Kunden.Field('KndStatus', '1');
+            AIAnwender.Kunden.Field('KndStatus', '1');
 
-       AIAnwender.Kunden.Field('ReferenzNr', ContactG."Prospect No.");
-       AIAnwender.Kunden.Update;
+        AIAnwender.Kunden.Field('ReferenzNr', ContactG."No.");
+        AIAnwender.Kunden.Update;
         END;
-        END;
+
+        ExportSuccessfullyG := 3;
+      END ELSE
+        MESSAGE(Text013);
+        ExportSuccessfullyG := 3;
     END;
 
     PROCEDURE UpdateReferenceNo@1109400005();
@@ -286,7 +331,7 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
       ContactG.GET(ContactG."No.");
 
       ContactG.MODIFY(TRUE);
-      AIAnwender.Lager.Field('KundenNr', ContactG."Prospect No.");
+      AIAnwender.Lager.Field('KundenNr', ContactG."No.");
       AIAnwender.Lager.Update;
     END;
 
@@ -300,6 +345,7 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
 
     BEGIN
     {
+
       +----------------------------------------------+
       | Copyright (c) 2025 Carya AG                  |
       +----------------------------------------------+
