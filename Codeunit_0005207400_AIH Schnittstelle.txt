@@ -2,8 +2,8 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
 {
   OBJECT-PROPERTIES
   {
-    Date=19.05.25;
-    Time=16:16:23;
+    Date=21.05.25;
+    Time=15:31:35;
     Modified=Yes;
     Version List=HAB;
   }
@@ -24,38 +24,37 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
       ContactG@1109400004 : Record 5047089;
       AIAnwender@1109400002 : Automation "{74359121-5B44-11D5-A68B-00105A5E4EC4} 1.1:{74359125-5B44-11D5-A68B-00105A5E4EC4}:'Anwender Datenbank DLL'.AnwenderData";
       AddressSalutation@1109400000 : Record 5029133;
-      Text001@1109400019 : TextConst 'ENU=Data have been exported successfully.;DES=Daten wurden erfolgreich exportiert.';
-      Text002@1109400018 : TextConst 'ENU=Data could not be exported.;DES=Daten konnten nicht exportiert werden.';
-      Text003@1109400017 : TextConst 'ENU=Customer already exists in AUTO-I Autohandel. Should the data be updated?;DES=Kunde ist bereits in AUTO-I Autohandel vorhanden. Sollen die Daten aktualisiert werden?';
-      Text004@1109400016 : TextConst 'ENU=Data were updated successfully.;DES=Daten wurden erfolgreich aktualisiert.';
-      Text005@1109400015 : TextConst 'ENU=Address Salutation Code and Customer Type do not match. Please correct first.;DES=Adressanredecode und Kundenart stimmen nicht Åberein. Bitte zuerst korrigieren.';
-      Text006@1109400011 : TextConst 'ENU=No data found.;DES=Keine Daten gefunden.';
-      Text007@1109400008 : TextConst 'ENU=AUTO-I;DES=AUTO-I';
-      Text008@1109400006 : TextConst 'ENU=Database could not be opened.;DES=Datenbank konnte nicht geîffnet werden.';
-      Text009@1109400003 : TextConst 'ENU=Database was opened sucesfully.;DES=Datenkbank konnte erfolgreich geîffnet werden';
-      Text010@1109400005 : TextConst 'ENU=No matching customer found.;DES=Kein passender Kunde gefunden.';
+      SucExport@1109400019 : TextConst 'ENU=Data has been exported successfully.;DES=Daten wurden erfolgreich exportiert.';
+      FailExport@1109400018 : TextConst 'ENU=Data could not be exported.;DES=Daten konnten nicht exportiert werden.';
+      CustExist@1109400017 : TextConst 'ENU=Customer already exists in AUTO-I Autohandel. Should the data be updated?;DES=Kunde ist bereits in AUTO-I Autohandel vorhanden. Sollen die Daten aktualisiert werden?';
+      UpdSuc@1109400016 : TextConst 'ENU=Data was updated successfully.;DES=Daten wurden erfolgreich aktualisiert.';
+      AddNotMatch@1109400015 : TextConst 'ENU=Address Salutation Code and Customer Type do not match. Please correct first.;DES=Adressanredecode und Kundenart stimmen nicht Åberein. Bitte zuerst korrigieren.';
+      NoDatafound@1109400011 : TextConst 'ENU=No data found.;DES=Keine Daten gefunden.';
+      CustNotAutoi@1109400008 : TextConst 'ENU=Customer doesnt exist in Auto-i-Handel;DES=Konatk ist in Auto-i-Handel nicht vorhanden';
+      DtbFailOpen@1109400006 : TextConst 'ENU=Database could not be opened.;DES=Datenbank konnte nicht geîffnet werden.';
+      DtbSucOpen@1109400003 : TextConst 'ENU=Database was opened sucesfully.;DES=Datenkbank konnte erfolgreich geîffnet werden';
+      CustNotMatch@1109400005 : TextConst 'ENU=No matching customer found.;DES=Kein passender Kunde gefunden.';
       CustomerExistsG@1109400020 : Integer;
       ExportSuccessfullyG@1109400021 : Integer;
       AIDCustomerNoG@1109400022 : Code[10];
-      AIDCredentials@1109400023 : Record 5045163;
-      Text011@1109400007 : TextConst 'ENU=Customer not found.;DES=" Kunde nicht gefunden"';
-      Text012@1109400009 : TextConst 'ENU=Customer update canceled;DES=" Kunden Aktualisierung abgebrochen"';
-      Text013@1109400001 : TextConst 'ENU=No matching customer found.;DES=Kein passender Kunde gefunden.';
+      AIHCredentials@1109400023 : Record 5045163;
+      CustNotFound@1109400007 : TextConst 'ENU=Customer not found.;DES=" Kunde nicht gefunden"';
+      CustUpdCanc@1109400009 : TextConst 'ENU=Customer update canceled;DES=" Kunden Aktualisierung abgebrochen"';
       AIHContactTempG@1109400010 : Record 5045160;
 
     PROCEDURE StartExport@1109400006(ContactP@1109400000 : Record 5047089);
     BEGIN
       ContactG := ContactP;
-      HauptprozessExport();
+      MainExport();
     END;
 
     PROCEDURE StartImport@1109400004(ContactP@1109400000 : Record 5047089);
     BEGIN
       ContactG := ContactP;
-      HauptprozessImport();
+      MainImport();
     END;
 
-    PROCEDURE HauptprozessExport@1109400001();
+    PROCEDURE MainExport@1109400001();
     VAR
       RecRefL@1109400003 : RecordRef;
       ActionTypeL@1109400002 : 'Launch,Send,Receive,Cockpit Functions,Show,Process,Close,Delete,Log Entry,Batch Close,Batch Delete';
@@ -70,24 +69,22 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
         ExpCustData();
       END ELSE BEGIN
         // Falls kein Kontakt gefunden wurde
-          MESSAGE(Text011);
+          MESSAGE(CustNotFound);
       END;
 
 
 
       CASE ExportSuccessfullyG OF
-        -1: MESSAGE(Text001);
-         2: MESSAGE(Text004);
-         3: ;
-        ELSE
-          MESSAGE(Text002);
+        -1: MESSAGE(SucExport);
+         2: MESSAGE(UpdSuc);
+         3: MESSAGE(FailExport);
       END;
 
       // DB Schliessen
       CloseDb();
     END;
 
-    PROCEDURE HauptprozessImport@1109400009();
+    PROCEDURE MainImport@1109400009();
     VAR
       RecRefL@1109400003 : RecordRef;
       ActionTypeL@1109400002 : 'Launch,Send,Receive,Cockpit Functions,Show,Process,Close,Delete,Log Entry,Batch Close,Batch Delete';
@@ -102,7 +99,7 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
         ImpCustData();
       END ELSE BEGIN
         // Falls kein Kontakt gefunden wurde
-          MESSAGE(Text011);
+        MESSAGE(CustNotFound);
       END;
 
 
@@ -115,16 +112,16 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
       OpenDB@1109400000 : Integer;
     BEGIN
 
-          // DB îffnen
-          IF ISCLEAR(AIAnwender) THEN
-            CREATE(AIAnwender);
+      // DB îffnen
+      IF ISCLEAR(AIAnwender) THEN
+        CREATE(AIAnwender);
 
-          OpenDB := AIAnwender.OpenDB(AIDCredentials."Directory Database");
+      OpenDB := AIAnwender.OpenDB(AIHCredentials."Directory Database");
 
-          IF OpenDB = -1 THEN
-            MESSAGE(Text009)
-          ELSE
-        MESSAGE(Text008);
+      IF OpenDB = -1 THEN
+        MESSAGE(DtbSucOpen)
+      ELSE
+        MESSAGE(DtbFailOpen);
     END;
 
     LOCAL PROCEDURE CloseDb@5045152();
@@ -143,19 +140,19 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
       ProfessionL@1109400001 : Record 5029123;
       ActionL@1109400000 : Action;
     BEGIN
-      // Check ob Adressanredecode mit Kundenart Åbereinstimmt. Ansonsten funktioniert die DatenÅbermittlung nicht
+      // Check ob Adressanredecode mit Kundenart Åbereinstimmt. Ansonsten funktioniert die DatenÅbermittlung nicht auch in der Doku erwÑh.
       AddressSalutation.RESET;
       AddressSalutation.SETCURRENTKEY(Code);
       AddressSalutation.SETRANGE(Code, ContactG."Address Salutation Code");
       IF AddressSalutation.FIND('-') THEN
         IF AddressSalutation."Customer Type" <> ContactG."Customer Type" THEN
-          ERROR(Text005);
+          ERROR(AddNotMatch);
 
 
       IF CustomerExistsG <> 0 THEN BEGIN
-        ConfirmL := DIALOG.CONFIRM(Text003, FALSE);
-      IF NOT ConfirmL THEN BEGIN
-          MESSAGE(Text012);
+        ConfirmL := DIALOG.CONFIRM(CustExist, FALSE);
+        IF NOT ConfirmL THEN BEGIN
+          MESSAGE(CustNotFound);
           EXIT;
         END;
 
@@ -195,6 +192,7 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
         ELSE
           CustomerClassL := '0';
       END;
+
       AIAnwender.Kunden.Field('KndKat', CustomerClassL);
 
       LetterSalutationL.RESET;
@@ -227,6 +225,7 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
         AIAnwender.Kunden.Field('KndStatus', '2')
       ELSE
         AIAnwender.Kunden.Field('KndStatus', '1');
+
       AIAnwender.Kunden.Update;
     END;
 
@@ -255,13 +254,13 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
         AIHContactTempG.INIT;
         REPEAT
           AIHContactTempG."Prospect No." :=AIAnwender.Kunden.Field('KundenNr');
-          AIHContactTempG."Name 2" :=AIAnwender.Kunden.Field('Suchbegriff');
+          AIHContactTempG."Search Name" :=AIAnwender.Kunden.Field('Suchbegriff');
           AIHContactTempG."Address Salutation Code" :=AIAnwender.Kunden.Field('Anrede');
           AIHContactTempG."Last Name" := COPYSTR(AIAnwender.Kunden.Field('Name'),1, MAXSTRLEN(AIHContactTempG."Last Name"));
           AIHContactTempG."First Name" :=AIAnwender.Kunden.Field('Vorname');
           AIHContactTempG.Address :=AIAnwender.Kunden.Field('Adresse1');
           AIHContactTempG."Address 2" :=AIAnwender.Kunden.Field('Adresse2');
-          AIHContactTempG.City :=AIAnwender.Kunden.Field('Adresse3');
+          AIHContactTempG.City :=AIAnwender.Kunden.Field('Ort');
           AIHContactTempG."Post Code" :=AIAnwender.Kunden.Field('PLZ');
           AIHContactTempG."Phone No." :=AIAnwender.Kunden.Field('Telefon Nr.');
           AIHContactTempG."Country Code" :=AIAnwender.Kunden.Field('Land');
@@ -280,17 +279,17 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
             AIHContactTempG."Mobile Phone No." :=AIAnwender.Kunden.Field('GDirekt');
             AIHContactTempG."Fax No." :=AIAnwender.Kunden.Field('GFax');
             AIHContactTempG."E-Mail" :=AIAnwender.Kunden.Field('GEMail');
-          END;
+            END;
 
       IF FindQuery2L = -1 THEN
             AIHContactTempG."Prospect No." := ContactG."Prospect No."
           ELSE
             AIHContactTempG."Prospect No." := AIAnwender.Kunden.Field('ReferenzNr');
 
-          IF NOT AIHContactTempG.MODIFY THEN
-             AIHContactTempG.INSERT;
+      IF NOT AIHContactTempG.MODIFY THEN
+        AIHContactTempG.INSERT;
 
-         AIAnwender.Kunden.MoveNext;
+        AIAnwender.Kunden.MoveNext;
 
         UNTIL AIAnwender.Kunden.EOF = -1;
 
@@ -310,11 +309,9 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
         AIAnwender.Kunden.Field('ReferenzNr', ContactG."No.");
         AIAnwender.Kunden.Update;
         END;
-
         ExportSuccessfullyG := 3;
       END ELSE
-        MESSAGE(Text013);
-        ExportSuccessfullyG := 3;
+      MESSAGE(CustNotAutoi)
     END;
 
     PROCEDURE UpdateReferenceNo@1109400005();
@@ -326,6 +323,7 @@ OBJECT Codeunit 5207400 AIH Schnittstelle
         AIAnwender.Kunden.Field('KndStatus', '2')
       ELSE
         AIAnwender.Kunden.Field('KndStatus', '1');
+
       AIAnwender.Kunden.Field('ReferenzNr', ContactG."Prospect No.");
       AIAnwender.Kunden.Update;
       ContactG.GET(ContactG."No.");

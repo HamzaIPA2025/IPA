@@ -2,15 +2,15 @@ OBJECT Form 5045160 AIH Comparison
 {
   OBJECT-PROPERTIES
   {
-    Date=19.05.25;
-    Time=16:37:21;
+    Date=21.05.25;
+    Time=17:08:30;
     Modified=Yes;
     Version List=HAB;
   }
   PROPERTIES
   {
-    Width=20240;
-    Height=18260;
+    Width=22440;
+    Height=19580;
     CaptionML=[ENU=Address Comparison;
                DES=AdressgegenÅberstellung;
                ITS=Confronto indirizzi;
@@ -20,96 +20,91 @@ OBJECT Form 5045160 AIH Comparison
     SourceTable=Table5045160;
     UpdateOnActivate=Yes;
     OnOpenForm=BEGIN
-                 {recProspectG.SETRANGE(recProspectG."Last Name", "Last Name");
-                 IF recProspectG.FINDSET THEN
-                   fncShowProspectFieldsG
-                 ELSE}
-                   recProspectG.GET("Prospect No.");
-                   fncShowProspectFieldsG;
+
+                   AIHContactTempG.GET("Prospect No.");
+                   ShowAutoiFields;
+                   ProspectG.GET("Prospect No.");
+                   ShowProspectFields;
                END;
 
     OnAfterGetCurrRecord=BEGIN
                            IF Rec."No." <> xRec."No." THEN
-                             recProspectG.GET(Rec."No.");
-                           fncShowProspectFieldsG;
+                             ProspectG.GET(Rec."No.");
+                           ShowProspectFields;
                          END;
 
   }
   CONTROLS
   {
-    { 1117900000;TextBox;3740 ;1100 ;2750 ;440  ;Editable=No;
+    { 1117900000;TextBox;3740 ;1100 ;2750 ;440  ;Name=fldContactNoG;
+                                                 Editable=No;
                                                  Focusable=No;
-                                                 SourceExpr="No." }
+                                                 CaptionML=[ENU=No.;
+                                                            DES=Nr.];
+                                                 SourceExpr=fldContactNoG }
     { 1117900001;Label  ;330  ;1100 ;3300 ;440  ;ParentControl=1117900000 }
-    { 1117900002;TextBox;3740 ;1980 ;5500 ;440  ;Editable=No;
+    { 1117900003;Label  ;220  ;3520 ;3300 ;440  ;CaptionML=[ENU=Last Name;
+                                                            DES=Nachname] }
+    { 1117900004;TextBox;3630 ;3740 ;5500 ;440  ;Editable=No;
                                                  Focusable=No;
-                                                 SourceExpr="First Name" }
-    { 1117900003;Label  ;330  ;1980 ;3300 ;440  ;ParentControl=1117900002 }
-    { 1117900004;TextBox;3740 ;2860 ;5500 ;440  ;Editable=No;
-                                                 Focusable=No;
-                                                 SourceExpr="Last Name" }
-    { 1117900005;Label  ;330  ;2860 ;3300 ;440  ;ParentControl=1117900004 }
-    { 1117900006;TextBox;3740 ;3740 ;5500 ;440  ;Editable=No;
+                                                 SourceExpr=fldContactLastNameG }
+    { 1117900005;Label  ;220  ;2970 ;3300 ;440  ;ParentControl=1117900004;
+                                                 CaptionML=[ENU=Search Name;
+                                                            DES=Suchname] }
+    { 1117900006;TextBox;3630 ;4620 ;5500 ;440  ;Editable=No;
                                                  Focusable=No;
                                                  CaptionML=[DEU=Strasse;
                                                             ENU=Street;
                                                             DES=Strasse;
                                                             ITS=Via;
                                                             FRS=Rue];
-                                                 SourceExpr=Street }
-    { 1117900007;Label  ;330  ;3740 ;3300 ;440  ;ParentControl=1117900006 }
-    { 1117900008;TextBox;3740 ;4620 ;2750 ;440  ;Editable=No;
+                                                 SourceExpr=fldContactStreetG }
+    { 1117900007;Label  ;220  ;4620 ;3300 ;440  ;ParentControl=1117900006 }
+    { 1117900012;TextBox;3630 ;7260 ;5610 ;440  ;Editable=No;
                                                  Focusable=No;
-                                                 SourceExpr="House No." }
-    { 1117900009;Label  ;330  ;4620 ;3300 ;440  ;ParentControl=1117900008 }
-    { 1117900010;TextBox;3740 ;5500 ;5500 ;440  ;Editable=No;
+                                                 SourceExpr=fldContactPostCodeG }
+    { 1117900013;Label  ;220  ;7260 ;3300 ;440  ;ParentControl=1117900012 }
+    { 1117900014;TextBox;3740 ;8250 ;5500 ;440  ;Editable=No;
                                                  Focusable=No;
-                                                 SourceExpr="Address 2" }
-    { 1117900011;Label  ;330  ;5500 ;3300 ;440  ;ParentControl=1117900010 }
-    { 1117900012;TextBox;3740 ;6380 ;2750 ;440  ;Editable=No;
+                                                 SourceExpr=fldContactCityG }
+    { 1117900016;TextBox;3740 ;10010;5500 ;440  ;Editable=No;
                                                  Focusable=No;
-                                                 SourceExpr="Post Code" }
-    { 1117900013;Label  ;330  ;6380 ;3300 ;440  ;ParentControl=1117900012 }
-    { 1117900014;TextBox;3740 ;7260 ;5500 ;440  ;Editable=No;
+                                                 SourceExpr=fldContactHomePhoneG }
+    { 1117900017;Label  ;330  ;10890;3300 ;440  ;ParentControl=1117900016 }
+    { 1117900018;TextBox;3740 ;10890;5500 ;440  ;Editable=No;
                                                  Focusable=No;
-                                                 SourceExpr=City }
-    { 1117900015;Label  ;330  ;7260 ;3300 ;440  ;ParentControl=1117900014 }
-    { 1117900016;TextBox;3740 ;8140 ;5500 ;440  ;Editable=No;
+                                                 SourceExpr=fldContactHomeFaxG }
+    { 1117900019;Label  ;330  ;10010;3300 ;440  ;ParentControl=1117900018 }
+    { 1117900020;TextBox;3740 ;11770;5500 ;440  ;Editable=No;
                                                  Focusable=No;
-                                                 SourceExpr="Home Phone No." }
-    { 1117900017;Label  ;330  ;8140 ;3300 ;440  ;ParentControl=1117900016 }
-    { 1117900018;TextBox;3740 ;9020 ;5500 ;440  ;Editable=No;
+                                                 SourceExpr=fldContactHomeMobileG }
+    { 1117900021;Label  ;330  ;11770;3300 ;440  ;ParentControl=1117900020;
+                                                 CaptionML=[ENU=Home Mobile Phone No.;
+                                                            DES=Heim Mobiltelefon] }
+    { 1117900024;TextBox;3740 ;12650;5500 ;440  ;Editable=No;
                                                  Focusable=No;
-                                                 SourceExpr="Home Fax No." }
-    { 1117900019;Label  ;330  ;9020 ;3300 ;440  ;ParentControl=1117900018 }
-    { 1117900020;TextBox;3740 ;9900 ;5500 ;440  ;Editable=No;
+                                                 SourceExpr=fldContactPhoneNoG }
+    { 1117900026;TextBox;3850 ;13420;5500 ;440  ;Editable=No;
                                                  Focusable=No;
-                                                 SourceExpr="Home Mobile Phone No." }
-    { 1117900021;Label  ;330  ;9900 ;3300 ;440  ;ParentControl=1117900020 }
-    { 1117900022;TextBox;3740 ;10780;5500 ;440  ;Editable=No;
-                                                 Focusable=No;
-                                                 SourceExpr="Home E-Mail" }
-    { 1117900023;Label  ;330  ;10780;3300 ;440  ;ParentControl=1117900022 }
-    { 1117900024;TextBox;3740 ;11660;5500 ;440  ;Editable=No;
-                                                 Focusable=No;
-                                                 SourceExpr="Phone No." }
-    { 1117900025;Label  ;330  ;11660;3300 ;440  ;ParentControl=1117900024 }
-    { 1117900026;TextBox;3740 ;12540;5500 ;440  ;Editable=No;
-                                                 Focusable=No;
-                                                 SourceExpr="Fax No." }
-    { 1117900027;Label  ;330  ;12540;3300 ;440  ;ParentControl=1117900026 }
-    { 1117900028;TextBox;3740 ;13420;5500 ;440  ;Editable=No;
+                                                 SourceExpr=fldContactFaxNoG }
+    { 1117900027;Label  ;440  ;13420;3300 ;440  ;Name=Fax.No;
+                                                 ParentControl=1117900026;
+                                                 CaptionML=[ENU=Fax.No;
+                                                            DES=" Fax Nummer"] }
+    { 1117900028;TextBox;3740 ;14190;5500 ;440  ;Editable=No;
                                                  Focusable=No;
                                                  SourceExpr="Mobile Phone No." }
-    { 1117900029;Label  ;330  ;13420;3300 ;440  ;ParentControl=1117900028 }
-    { 1117900030;TextBox;3740 ;14300;5500 ;440  ;Editable=No;
+    { 1117900029;Label  ;330  ;14190;3300 ;440  ;ParentControl=1117900028 }
+    { 1117900030;TextBox;3740 ;15070;5500 ;440  ;Editable=No;
                                                  Focusable=No;
                                                  SourceExpr="E-Mail" }
-    { 1117900031;Label  ;330  ;14300;3300 ;440  ;ParentControl=1117900030 }
+    { 1117900031;Label  ;330  ;15070;3300 ;440  ;ParentControl=1117900030 }
     { 1117900032;Label  ;10670;1100 ;3300 ;440  ;ParentControl=1117900036 }
-    { 1117900033;Label  ;10670;1980 ;3300 ;440  ;ParentControl=1117900037 }
-    { 1117900034;Label  ;10670;2860 ;3300 ;440  ;ParentControl=1117900038 }
-    { 1117900035;Label  ;10670;3740 ;3300 ;440  ;ParentControl=1117900039 }
+    { 1117900033;Label  ;10670;2860 ;3300 ;440  ;ParentControl=1117900037;
+                                                 CaptionML=[ENU=Search Name;
+                                                            DES=Suchname] }
+    { 1117900034;Label  ;10670;3740 ;3300 ;440  ;ParentControl=1117900038 }
+    { 1117900035;Label  ;10670;4730 ;3300 ;440  ;ParentControl=1117900039 }
     { 1117900036;TextBox;14080;1100 ;2750 ;440  ;Name=fldProspNoG;
                                                  Editable=No;
                                                  CaptionML=[DEU=Nr.;
@@ -118,26 +113,21 @@ OBJECT Form 5045160 AIH Comparison
                                                             ITS=Codice;
                                                             FRS=N¯];
                                                  SourceExpr=fldProspNoG }
-    { 1117900037;TextBox;14080;1980 ;5500 ;440  ;Name=fldProspFirstNameG;
+    { 1117900037;TextBox;14080;2860 ;5500 ;440  ;Name=fldProspFirstNameG;
                                                  CaptionML=[DEU=Vorname;
                                                             ENU=First Name;
                                                             DES=Vorname;
                                                             ITS=Nome;
                                                             FRS=PrÇnom];
-                                                 SourceExpr=fldProspFirstNameG;
+                                                 SourceExpr=fldProspSearchNameG;
                                                  OnFormat=BEGIN
-                                                            IF "First Name" <> fldProspFirstNameG THEN
+                                                            IF fldContactFirstNameG <> fldProspSearchNameG THEN
                                                               CurrForm.fldProspFirstNameG.UPDATEFORECOLOR(255)
                                                             ELSE
                                                               CurrForm.fldProspFirstNameG.UPDATEFORECOLOR(0);
                                                           END;
-
-                                                 OnValidate=BEGIN
-                                                              recProspectG.VALIDATE("First Name",fldProspFirstNameG);
-                                                              fncShowProspectFieldsG;
-                                                            END;
-                                                             }
-    { 1117900038;TextBox;14080;2860 ;5500 ;440  ;Name=fldProspLastNameG;
+                                                           }
+    { 1117900038;TextBox;14080;3740 ;5500 ;440  ;Name=fldProspLastNameG;
                                                  CaptionML=[DEU=Nachname;
                                                             ENU=Last Name;
                                                             DES=Nachname;
@@ -152,11 +142,11 @@ OBJECT Form 5045160 AIH Comparison
                                                           END;
 
                                                  OnValidate=BEGIN
-                                                              recProspectG.VALIDATE("Last Name",fldProspLastNameG);
-                                                              fncShowProspectFieldsG;
+                                                              ProspectG.VALIDATE("Last Name",fldProspLastNameG);
+                                                              ShowProspectFields;
                                                             END;
                                                              }
-    { 1117900039;TextBox;14080;3740 ;5500 ;440  ;Name=fldProspStreetG;
+    { 1117900039;TextBox;14080;4730 ;5500 ;440  ;Name=fldProspStreetG;
                                                  CaptionML=[DEU=Strasse;
                                                             ENU=Street;
                                                             DES=Strasse;
@@ -164,58 +154,18 @@ OBJECT Form 5045160 AIH Comparison
                                                             FRS=Rue];
                                                  SourceExpr=fldProspStreetG;
                                                  OnFormat=BEGIN
-                                                            IF Street <> fldProspStreetG THEN
+                                                            IF fldContactStreetG <> fldProspStreetG THEN
                                                               CurrForm.fldProspStreetG.UPDATEFORECOLOR(255)
                                                             ELSE
                                                               CurrForm.fldProspStreetG.UPDATEFORECOLOR(0);
                                                           END;
 
                                                  OnValidate=BEGIN
-                                                              recProspectG.VALIDATE(Street,fldProspStreetG);
-                                                              fncShowProspectFieldsG;
+                                                              ProspectG.VALIDATE(Street,fldProspStreetG);
+                                                              ShowProspectFields;
                                                             END;
                                                              }
-    { 1117900040;TextBox;14080;4620 ;2750 ;440  ;Name=fldProspHouseG;
-                                                 CaptionML=[DEU=Hausnr.;
-                                                            ENU=House No.;
-                                                            DES=Hausnr.;
-                                                            ITS=N. civico;
-                                                            FRS=N¯ domicile];
-                                                 SourceExpr=fldProspHouseG;
-                                                 OnFormat=BEGIN
-                                                            IF "House No." <> fldProspHouseG THEN
-                                                              CurrForm.fldProspHouseG.UPDATEFORECOLOR(255)
-                                                            ELSE
-                                                              CurrForm.fldProspHouseG.UPDATEFORECOLOR(0);
-                                                          END;
-
-                                                 OnValidate=BEGIN
-                                                              recProspectG.VALIDATE("House No.",fldProspHouseG);
-                                                              fncShowProspectFieldsG;
-                                                            END;
-                                                             }
-    { 1117900041;Label  ;10670;4620 ;3300 ;440  ;ParentControl=1117900040 }
-    { 1117900042;TextBox;14080;5500 ;5500 ;440  ;Name=fldProspAddr2G;
-                                                 CaptionML=[DEU=Adresse 2;
-                                                            ENU=Address 2;
-                                                            DES=Adresse 2;
-                                                            ITS=Indirizzo 2;
-                                                            FRS=Adresse 2];
-                                                 SourceExpr=fldProspAddr2G;
-                                                 OnFormat=BEGIN
-                                                            IF "Address 2" <> fldProspAddr2G THEN
-                                                              CurrForm.fldProspAddr2G.UPDATEFORECOLOR(255)
-                                                            ELSE
-                                                              CurrForm.fldProspAddr2G.UPDATEFORECOLOR(0);
-                                                          END;
-
-                                                 OnValidate=BEGIN
-                                                              recProspectG.VALIDATE("Address 2",fldProspAddr2G);
-                                                              fncShowProspectFieldsG;
-                                                            END;
-                                                             }
-    { 1117900043;Label  ;10670;5500 ;3300 ;440  ;ParentControl=1117900042 }
-    { 1117900044;TextBox;14080;6380 ;2750 ;440  ;Name=fldProspPostCodeG;
+    { 1117900044;TextBox;14080;7260 ;2750 ;440  ;Name=fldProspPostCodeG;
                                                  CaptionML=[DEU=PLZ Code;
                                                             ENU=Post Code;
                                                             DES=PLZ Code;
@@ -230,12 +180,12 @@ OBJECT Form 5045160 AIH Comparison
                                                           END;
 
                                                  OnValidate=BEGIN
-                                                              recProspectG.VALIDATE("Post Code",fldProspPostCodeG);
-                                                              fncShowProspectFieldsG;
+                                                              ProspectG.VALIDATE("Post Code",fldProspPostCodeG);
+                                                              ShowProspectFields;
                                                             END;
                                                              }
-    { 1117900045;Label  ;10670;6380 ;3300 ;440  ;ParentControl=1117900044 }
-    { 1117900046;TextBox;14080;7260 ;5500 ;440  ;Name=fldProspCityG;
+    { 1117900045;Label  ;10670;7260 ;3300 ;440  ;ParentControl=1117900044 }
+    { 1117900046;TextBox;13970;8030 ;5500 ;440  ;Name=fldProspCityG;
                                                  CaptionML=[DEU=Ort;
                                                             ENU=City;
                                                             DES=Ort;
@@ -243,19 +193,14 @@ OBJECT Form 5045160 AIH Comparison
                                                             FRS=Ville];
                                                  SourceExpr=fldProspCityG;
                                                  OnFormat=BEGIN
-                                                            IF City <> fldProspCityG THEN
+                                                            IF fldContactCityG <> fldProspCityG THEN
                                                               CurrForm.fldProspCityG.UPDATEFORECOLOR(255)
                                                             ELSE
                                                               CurrForm.fldProspCityG.UPDATEFORECOLOR(0);
                                                           END;
-
-                                                 OnValidate=BEGIN
-                                                              recProspectG.VALIDATE(City,fldProspCityG);
-                                                              fncShowProspectFieldsG;
-                                                            END;
-                                                             }
-    { 1117900047;Label  ;10670;7260 ;3300 ;440  ;ParentControl=1117900046 }
-    { 1117900048;TextBox;14080;8140 ;5500 ;440  ;Name=fldProspHomePhoneG;
+                                                           }
+    { 1117900047;Label  ;10560;8030 ;3300 ;440  ;ParentControl=1117900046 }
+    { 1117900048;TextBox;14080;9790 ;5500 ;440  ;Name=fldProspHomePhoneG;
                                                  CaptionML=[DEU=Telefon privat;
                                                             ENU=Home Phone No.;
                                                             DES=Telefon privat;
@@ -270,12 +215,12 @@ OBJECT Form 5045160 AIH Comparison
                                                           END;
 
                                                  OnValidate=BEGIN
-                                                              recProspectG.VALIDATE("Home Phone No.",fldProspHomePhoneG);
-                                                              fncShowProspectFieldsG;
+                                                              ProspectG.VALIDATE("Home Phone No.",fldProspHomePhoneG);
+                                                              ShowProspectFields;
                                                             END;
                                                              }
-    { 1117900049;Label  ;10670;8140 ;3300 ;440  ;ParentControl=1117900048 }
-    { 1117900050;TextBox;14080;9020 ;5500 ;440  ;Name=fldProspHomeFaxG;
+    { 1117900049;Label  ;10670;9790 ;3300 ;440  ;ParentControl=1117900048 }
+    { 1117900050;TextBox;14080;10670;5500 ;440  ;Name=fldProspHomeFaxG;
                                                  CaptionML=[DEU=Fax privat;
                                                             ENU=Home Fax No.;
                                                             DES=Fax privat;
@@ -290,12 +235,12 @@ OBJECT Form 5045160 AIH Comparison
                                                           END;
 
                                                  OnValidate=BEGIN
-                                                              recProspectG.VALIDATE("Home Fax No.",fldProspHomeFaxG);
-                                                              fncShowProspectFieldsG;
+                                                              ProspectG.VALIDATE("Home Fax No.",fldProspHomeFaxG);
+                                                              ShowProspectFields;
                                                             END;
                                                              }
-    { 1117900051;Label  ;10670;9020 ;3300 ;440  ;ParentControl=1117900050 }
-    { 1117900052;TextBox;14080;9900 ;5500 ;440  ;Name=fldProspHomeMobileG;
+    { 1117900051;Label  ;10670;10670;3300 ;440  ;ParentControl=1117900050 }
+    { 1117900052;TextBox;14080;11440;5500 ;440  ;Name=fldProspHomeMobileG;
                                                  CaptionML=[DEU=Mobiltelefon privat;
                                                             ENU=Home Mobile Phone No.;
                                                             DES=Mobiltelefon privat;
@@ -310,32 +255,12 @@ OBJECT Form 5045160 AIH Comparison
                                                           END;
 
                                                  OnValidate=BEGIN
-                                                              recProspectG.VALIDATE("Home Mobile Phone No.",fldProspHomeMobileG);
-                                                              fncShowProspectFieldsG;
+                                                              ProspectG.VALIDATE("Home Mobile Phone No.",fldProspHomeMobileG);
+                                                              ShowProspectFields;
                                                             END;
                                                              }
-    { 1117900053;Label  ;10670;9900 ;3300 ;440  ;ParentControl=1117900052 }
-    { 1117900054;TextBox;14080;10780;5500 ;440  ;Name=fldProspHomeEmailG;
-                                                 CaptionML=[DEU=Email privat;
-                                                            ENU=Home E-Mail;
-                                                            DES=Email privat;
-                                                            ITS=E-Mail privata;
-                                                            FRS=E-mail privÇ];
-                                                 SourceExpr=fldProspHomeEmailG;
-                                                 OnFormat=BEGIN
-                                                            IF "Home E-Mail" <> fldProspHomeEmailG THEN
-                                                              CurrForm.fldProspHomeEmailG.UPDATEFORECOLOR(255)
-                                                            ELSE
-                                                              CurrForm.fldProspHomeEmailG.UPDATEFORECOLOR(0);
-                                                          END;
-
-                                                 OnValidate=BEGIN
-                                                              recProspectG.VALIDATE("Home E-Mail",fldProspHomeEmailG);
-                                                              fncShowProspectFieldsG;
-                                                            END;
-                                                             }
-    { 1117900055;Label  ;10670;10780;3300 ;440  ;ParentControl=1117900054 }
-    { 1117900056;TextBox;14080;11660;5500 ;440  ;Name=fldProspPhoneNoG;
+    { 1117900053;Label  ;10560;11440;3300 ;440  ;ParentControl=1117900052 }
+    { 1117900056;TextBox;14080;12430;5500 ;440  ;Name=fldProspPhoneNoG;
                                                  CaptionML=[DEU=Telefon geschÑftlich;
                                                             ENU=Phone No.;
                                                             DES=Telefon geschÑftlich;
@@ -350,12 +275,12 @@ OBJECT Form 5045160 AIH Comparison
                                                           END;
 
                                                  OnValidate=BEGIN
-                                                              recProspectG.VALIDATE("Phone No.",fldProspPhoneNoG);
-                                                              fncShowProspectFieldsG;
+                                                              ProspectG.VALIDATE("Phone No.",fldProspPhoneNoG);
+                                                              ShowProspectFields;
                                                             END;
                                                              }
-    { 1117900057;Label  ;10670;11660;3300 ;440  ;ParentControl=1117900056 }
-    { 1117900058;TextBox;14080;12540;5500 ;440  ;Name=fldProspFaxNoG;
+    { 1117900057;Label  ;10670;12430;3300 ;440  ;ParentControl=1117900056 }
+    { 1117900058;TextBox;14190;13420;5500 ;440  ;Name=fldProspFaxNoG;
                                                  CaptionML=[DEU=Fax geschÑftlich;
                                                             ENU=Fax No.;
                                                             DES=Fax geschÑftlich;
@@ -370,12 +295,12 @@ OBJECT Form 5045160 AIH Comparison
                                                           END;
 
                                                  OnValidate=BEGIN
-                                                              recProspectG.VALIDATE("Fax No.",fldProspFaxNoG);
-                                                              fncShowProspectFieldsG;
+                                                              ProspectG.VALIDATE("Fax No.",fldProspFaxNoG);
+                                                              ShowProspectFields;
                                                             END;
                                                              }
-    { 1117900059;Label  ;10670;12540;3300 ;440  ;ParentControl=1117900058 }
-    { 1117900060;TextBox;14080;13420;5500 ;440  ;Name=fldProspMobileG;
+    { 1117900059;Label  ;10780;13420;3300 ;440  ;ParentControl=1117900058 }
+    { 1117900060;TextBox;14080;14190;5500 ;440  ;Name=fldProspMobileG;
                                                  CaptionML=[DEU=Mobiltelefon geschÑftlich;
                                                             ENU=Mobile Phone No.;
                                                             DES=Mobiltelefon geschÑftlich;
@@ -390,12 +315,12 @@ OBJECT Form 5045160 AIH Comparison
                                                           END;
 
                                                  OnValidate=BEGIN
-                                                              recProspectG.VALIDATE("Mobile Phone No.",fldProspMobileG);
-                                                              fncShowProspectFieldsG;
+                                                              ProspectG.VALIDATE("Mobile Phone No.",fldProspMobileG);
+                                                              ShowProspectFields;
                                                             END;
                                                              }
-    { 1117900061;Label  ;10670;13420;3300 ;440  ;ParentControl=1117900060 }
-    { 1117900062;TextBox;14080;14300;5500 ;440  ;Name=fldProspEmailG;
+    { 1117900061;Label  ;10670;14190;3300 ;440  ;ParentControl=1117900060 }
+    { 1117900062;TextBox;14080;14960;5500 ;440  ;Name=fldProspEmailG;
                                                  CaptionML=[DEU=Email geschÑftlich;
                                                             ENU=E-Mail;
                                                             DES=Email geschÑftlich;
@@ -410,11 +335,11 @@ OBJECT Form 5045160 AIH Comparison
                                                           END;
 
                                                  OnValidate=BEGIN
-                                                              recProspectG.VALIDATE("E-Mail",fldProspEmailG);
-                                                              fncShowProspectFieldsG;
+                                                              ProspectG.VALIDATE("E-Mail",fldProspEmailG);
+                                                              ShowProspectFields;
                                                             END;
                                                              }
-    { 1117900063;Label  ;10670;14300;3300 ;440  ;ParentControl=1117900062 }
+    { 1117900063;Label  ;10560;14960;3300 ;440  ;ParentControl=1117900062 }
     { 1117900067;Label  ;330  ;110  ;4510 ;660  ;HorzAlign=Center;
                                                  BackColor=12632256;
                                                  BackTransparent=No;
@@ -439,80 +364,73 @@ OBJECT Form 5045160 AIH Comparison
                                                  ShowCaption=No;
                                                  Bitmap=1290;
                                                  OnPush=BEGIN
-                                                          recProspectG.VALIDATE("First Name",Rec."First Name");
-                                                          fncShowProspectFieldsG;
+                                                          ProspectG.VALIDATE("First Name",Rec."First Name");
+                                                          ShowProspectFields;
                                                         END;
                                                          }
-    { 1117900066;CommandButton;9570;2640;770;770;Name=ButLastNameG;
+    { 1117900066;CommandButton;9570;3630;770;770;Name=ButLastNameG;
                                                  ShowCaption=No;
                                                  Bitmap=1290;
                                                  OnPush=BEGIN
-                                                          recProspectG.VALIDATE("Last Name",Rec."Last Name");
-                                                          fncShowProspectFieldsG;
+                                                          ProspectG.VALIDATE("Last Name",Rec."Last Name");
+                                                          ShowProspectFields;
                                                         END;
                                                          }
-    { 1117900069;CommandButton;9570;3520;770;770;Name=ButStreetG;
+    { 1117900069;CommandButton;9570;4510;770;770;Name=ButStreetG;
                                                  ShowCaption=No;
                                                  Bitmap=1290;
                                                  OnPush=BEGIN
-                                                          recProspectG.VALIDATE(Street,Rec.Street);
-                                                          fncShowProspectFieldsG;
+                                                          ProspectG.VALIDATE(Street,ProspectG.Street);
+                                                          ShowProspectFields;
                                                         END;
                                                          }
-    { 1117900070;CommandButton;9570;4400;770;770;Name=ButHouseNoG;
+    { 1117900071;CommandButton;9570;2750;770;770;Name=ButAddress2G;
                                                  ShowCaption=No;
                                                  Bitmap=1290;
                                                  OnPush=BEGIN
-                                                          recProspectG.VALIDATE("House No.",Rec."House No.");
-                                                          fncShowProspectFieldsG;
+                                                          ProspectG.VALIDATE("Search Name",Rec."Search Name");
+                                                          ShowProspectFields;
                                                         END;
                                                          }
-    { 1117900071;CommandButton;9570;5280;770;770;Name=ButAddress2G;
+    { 1117900072;CommandButton;9570;7040;770;770;Name=ButPostCodeG;
                                                  ShowCaption=No;
                                                  Bitmap=1290;
                                                  OnPush=BEGIN
-                                                          recProspectG.VALIDATE("Address 2",Rec."Address 2");
-                                                          fncShowProspectFieldsG;
+                                                          ProspectG.VALIDATE("Post Code",Rec."Post Code");
+                                                          ShowProspectFields;
                                                         END;
                                                          }
-    { 1117900072;CommandButton;9570;6160;770;770;Name=ButPostCodeG;
+    { 1117900073;CommandButton;9570;7920;770;770;Name=ButCityG;
                                                  ShowCaption=No;
                                                  Bitmap=1290;
                                                  OnPush=BEGIN
-                                                          recProspectG.VALIDATE("Post Code",Rec."Post Code");
-                                                          fncShowProspectFieldsG;
+                                                          ProspectG.VALIDATE(City,Rec.City);
+                                                          ShowProspectFields;
                                                         END;
                                                          }
-    { 1117900073;CommandButton;9570;7040;770;770;Name=ButCityG;
+    { 1117900074;CommandButton;14410;6050;770;660;
+                                                 Name=ButHomePhoneG;
                                                  ShowCaption=No;
                                                  Bitmap=1290;
                                                  OnPush=BEGIN
-                                                          recProspectG.VALIDATE(City,Rec.City);
-                                                          fncShowProspectFieldsG;
-                                                        END;
-                                                         }
-    { 1117900074;CommandButton;9570;7920;770;770;Name=ButHomePhoneG;
-                                                 ShowCaption=No;
-                                                 Bitmap=1290;
-                                                 OnPush=BEGIN
-                                                          recProspectG.VALIDATE("Home Phone No.",Rec."Home Phone No.");
-                                                          fncShowProspectFieldsG;
+                                                          ProspectG.VALIDATE("Home Phone No.",Rec."Home Phone No.");
+                                                          ShowProspectFields;
                                                         END;
                                                          }
     { 1117900075;CommandButton;9570;8800;770;770;Name=ButHomeFaxG;
                                                  ShowCaption=No;
                                                  Bitmap=1290;
                                                  OnPush=BEGIN
-                                                          recProspectG.VALIDATE("Home Fax No.",Rec."Home Fax No.");
-                                                          fncShowProspectFieldsG;
+                                                          ProspectG.VALIDATE("Home Fax No.",Rec."Home Fax No.");
+                                                          ShowProspectFields;
                                                         END;
                                                          }
     { 1117900076;CommandButton;9570;9680;770;770;Name=ButHomeMobileG;
                                                  ShowCaption=No;
                                                  Bitmap=1290;
                                                  OnPush=BEGIN
-                                                          recProspectG.VALIDATE("Home Mobile Phone No.",Rec."Home Mobile Phone No.");
-                                                          fncShowProspectFieldsG;
+                                                          ProspectG.VALIDATE("Home Mobile Phone No.",Rec."Home Mobile Phone No.");
+                                                          ShowProspectFields;
                                                         END;
                                                          }
     { 1117900077;CommandButton;9570;10560;770;770;
@@ -520,8 +438,8 @@ OBJECT Form 5045160 AIH Comparison
                                                  ShowCaption=No;
                                                  Bitmap=1290;
                                                  OnPush=BEGIN
-                                                          recProspectG.VALIDATE("Home E-Mail",Rec."Home E-Mail");
-                                                          fncShowProspectFieldsG;
+                                                          ProspectG.VALIDATE("Home E-Mail",Rec."Home E-Mail");
+                                                          ShowProspectFields;
                                                         END;
                                                          }
     { 1117900078;CommandButton;9570;11440;770;770;
@@ -529,103 +447,92 @@ OBJECT Form 5045160 AIH Comparison
                                                  ShowCaption=No;
                                                  Bitmap=1290;
                                                  OnPush=BEGIN
-                                                          recProspectG.VALIDATE("Phone No.",Rec."Phone No.");
-                                                          fncShowProspectFieldsG;
+                                                          ProspectG.VALIDATE("Phone No.",Rec."Phone No.");
+                                                          ShowProspectFields;
                                                         END;
                                                          }
-    { 1117900079;CommandButton;9570;12320;770;770;
-                                                 Name=ButBusinessFaxG;
-                                                 ShowCaption=No;
-                                                 Bitmap=1290;
-                                                 OnPush=BEGIN
-                                                          recProspectG.VALIDATE("Fax No.",Rec."Fax No.");
-                                                          fncShowProspectFieldsG;
-                                                        END;
-                                                         }
-    { 1117900080;CommandButton;9570;13200;770;770;
+    { 1117900080;CommandButton;9570;12320;770;770;
                                                  Name=ButBusinessMobileG;
                                                  ShowCaption=No;
                                                  Bitmap=1290;
                                                  OnPush=BEGIN
-                                                          recProspectG.VALIDATE("Mobile Phone No.",Rec."Mobile Phone No.");
-                                                          fncShowProspectFieldsG;
+                                                          ProspectG.VALIDATE("Mobile Phone No.",Rec."Mobile Phone No.");
+                                                          ShowProspectFields;
                                                         END;
                                                          }
-    { 1117900081;CommandButton;9570;14080;770;770;
+    { 1117900081;CommandButton;9570;13200;770;770;
                                                  Name=ButBusinessEmailG;
                                                  ShowCaption=No;
                                                  Bitmap=1290;
                                                  OnPush=BEGIN
-                                                          recProspectG.VALIDATE("E-Mail",Rec."E-Mail");
-                                                          fncShowProspectFieldsG;
+                                                          ProspectG.VALIDATE("E-Mail",Rec."E-Mail");
+                                                          ShowProspectFields;
                                                         END;
                                                          }
-    { 1117900083;CommandButton;9350;15840;1210;1100;
+    { 1117900083;CommandButton;9350;16170;1210;1100;
                                                  Name=ButAllDataG;
                                                  ShowCaption=No;
                                                  BitmapPos=Center;
                                                  Bitmap=1290;
                                                  OnPush=BEGIN
                                                           IF Rec."First Name" <> '' THEN
-                                                            recProspectG.VALIDATE("First Name",Rec."First Name");
+                                                            ProspectG.VALIDATE("First Name",Rec."First Name");
                                                           IF Rec."Last Name" <> '' THEN
-                                                            recProspectG.VALIDATE("Last Name",Rec."Last Name");
-                                                          IF Rec.Street <> '' THEN
-                                                            recProspectG.VALIDATE(Street,Rec.Street);
-                                                          IF Rec."House No." <> '' THEN
-                                                            recProspectG.VALIDATE("House No.",Rec."House No.");
+                                                            ProspectG.VALIDATE("Last Name",Rec."Last Name");
+                                                          IF ProspectG.Street <> '' THEN
+                                                            ProspectG.VALIDATE(Street,ProspectG.Street);
                                                           IF Rec."Address 2" <> '' THEN
-                                                            recProspectG.VALIDATE("Address 2",Rec."Address 2");
+                                                            ProspectG.VALIDATE("Address 2",Rec."Address 2");
                                                           IF Rec."Post Code" <> '' THEN
-                                                            recProspectG.VALIDATE("Post Code",Rec."Post Code");
+                                                            ProspectG.VALIDATE("Post Code",Rec."Post Code");
                                                           IF Rec.City <> '' THEN
-                                                            recProspectG.VALIDATE(City,Rec.City);
+                                                            ProspectG.VALIDATE(City,Rec.City);
                                                           IF Rec."Home Phone No." <> '' THEN
-                                                            recProspectG.VALIDATE("Home Phone No.",Rec."Home Phone No.");
+                                                            ProspectG.VALIDATE("Home Phone No.",Rec."Home Phone No.");
                                                           IF Rec."Home Fax No." <> '' THEN
-                                                            recProspectG.VALIDATE("Home Fax No.",Rec."Home Fax No.");
+                                                            ProspectG.VALIDATE("Home Fax No.",Rec."Home Fax No.");
                                                           IF Rec."Home Mobile Phone No." <> '' THEN
-                                                            recProspectG.VALIDATE("Home Mobile Phone No.",Rec."Home Mobile Phone No.");
+                                                            ProspectG.VALIDATE("Home Mobile Phone No.",Rec."Home Mobile Phone No.");
                                                           IF Rec."Home E-Mail" <> '' THEN
-                                                            recProspectG.VALIDATE("Home E-Mail",Rec."Home E-Mail");
+                                                            ProspectG.VALIDATE("Home E-Mail",Rec."Home E-Mail");
                                                           IF Rec."Phone No." <> '' THEN
-                                                            recProspectG.VALIDATE("Phone No.",Rec."Phone No.");
+                                                            ProspectG.VALIDATE("Phone No.",Rec."Phone No.");
                                                           IF Rec."Fax No." <> '' THEN
-                                                            recProspectG.VALIDATE("Fax No.",Rec."Fax No.");
+                                                            ProspectG.VALIDATE("Fax No.",Rec."Fax No.");
                                                           IF Rec."Mobile Phone No." <> '' THEN
-                                                            recProspectG.VALIDATE("Mobile Phone No.",Rec."Mobile Phone No.");
+                                                            ProspectG.VALIDATE("Mobile Phone No.",Rec."Mobile Phone No.");
                                                           IF Rec."E-Mail" <> '' THEN
-                                                            recProspectG.VALIDATE("E-Mail",Rec."E-Mail");
-                                                          fncShowProspectFieldsG;
+                                                            ProspectG.VALIDATE("E-Mail",Rec."E-Mail");
+                                                          ShowProspectFields;
                                                         END;
                                                          }
-    { 1117900084;Label  ;5940 ;16170;3300 ;440  ;LeaderDots=No;
+    { 1117900084;Label  ;5830 ;16500;3300 ;440  ;LeaderDots=No;
                                                  CaptionML=[ENU=Resume all;
                                                             DES=Alles Åbernehmen;
                                                             ITS=Riprendere tutto;
                                                             FRS=Reprendre tout] }
-    { 1117900082;CommandButton;9790;17160;2200;550;
+    { 1117900082;CommandButton;9900;18700;2200;550;
                                                  HorzGlue=Right;
                                                  VertGlue=Bottom;
                                                  Default=Yes;
                                                  PushAction=LookupOK;
                                                  InvalidActionAppearance=Hide;
                                                  OnPush=BEGIN
-                                                          //recProspectG.UpdateAddressAllCompanies;
+                                                          ProspectG.UpdateAddressAllCompanies;
                                                           MESSAGE('GUCCI');
-                                                          recProspectG.MODIFY(TRUE);
+                                                          ProspectG.MODIFY(TRUE);
                                                           Rec.MODIFY(TRUE);
 
                                                           Rec.NEXT;
                                                         END;
                                                          }
-    { 1117900085;CommandButton;14850;17160;2200;550;
+    { 1117900085;CommandButton;14850;18700;2200;550;
                                                  HorzGlue=Right;
                                                  VertGlue=Bottom;
                                                  Cancel=Yes;
                                                  PushAction=LookupCancel;
                                                  InvalidActionAppearance=Hide }
-    { 1117900086;CommandButton;17380;17160;2200;550;
+    { 1117900086;CommandButton;17380;18700;2200;550;
                                                  HorzGlue=Right;
                                                  VertGlue=Bottom;
                                                  PushAction=FormHelp }
@@ -634,8 +541,8 @@ OBJECT Form 5045160 AIH Comparison
                                                  HorzAlign=Center;
                                                  FontSize=9;
                                                  FontBold=Yes;
-                                                 SourceExpr=recProspectG."Last Date Modified" }
-    { 1117900091;CommandButton;12320;17160;2200;550;
+                                                 SourceExpr=ProspectG."Last Date Modified" }
+    { 1117900091;CommandButton;12320;18700;2200;550;
                                                  HorzGlue=Right;
                                                  VertGlue=Bottom;
                                                  PushAction=LookupOK;
@@ -647,21 +554,100 @@ OBJECT Form 5045160 AIH Comparison
                                                           Rec.MODIFY(TRUE);
                                                         END;
                                                          }
+    { 1109400000;CommandButton;7480;18700;2200;550;
+                                                 HorzGlue=Right;
+                                                 VertGlue=Bottom;
+                                                 Default=Yes;
+                                                 PushAction=LookupOK;
+                                                 InvalidActionAppearance=Hide;
+                                                 OnPush=BEGIN
+                                                          ProspectG.UpdateAddressAllCompanies;
+                                                          MESSAGE('GUCCI');
+                                                          ProspectG.MODIFY(TRUE);
+                                                          Rec.MODIFY(TRUE);
+
+                                                          Rec.NEXT;
+                                                        END;
+                                                         }
+    { 1109400003;TextBox;3630 ;2750 ;5500 ;440  ;Editable=No;
+                                                 Focusable=No;
+                                                 SourceExpr=fldContactSearchNameG }
+    { 1109400004;TextBox;3740 ;1980 ;5500 ;440  ;Editable=No;
+                                                 Focusable=No;
+                                                 SourceExpr=fldContactFirstNameG }
+    { 1109400005;Label  ;220  ;1980 ;3300 ;440  ;CaptionML=[ENU=First Name;
+                                                            DES=Vorname] }
+    { 1109400006;CommandButton;9570;14080;770;660;
+                                                 Name=ButBusinessEmailG;
+                                                 ShowCaption=No;
+                                                 Bitmap=1290;
+                                                 OnPush=BEGIN
+                                                          ProspectG.VALIDATE("E-Mail",Rec."E-Mail");
+                                                          ShowProspectFields;
+                                                        END;
+                                                         }
+    { 1109400007;TextBox;14300;1980 ;5500 ;440  ;Name=fldProspFirstNameG;
+                                                 CaptionML=[DEU=Vorname;
+                                                            ENU=First Name;
+                                                            DES=Vorname;
+                                                            ITS=Nome;
+                                                            FRS=PrÇnom];
+                                                 SourceExpr=fldProspFirstNameG;
+                                                 OnValidate=BEGIN
+                                                              IF fldContactFirstNameG <> fldProspFirstNameG THEN
+                                                                CurrForm.fldProspFirstNameG.UPDATEFORECOLOR(255)
+                                                              ELSE
+                                                                CurrForm.fldProspFirstNameG.UPDATEFORECOLOR(0);
+                                                            END;
+                                                             }
+    { 1109400008;Label  ;10670;1980 ;3300 ;440  ;CaptionML=[DEU=Vorname;
+                                                            ENU=First Name;
+                                                            DES=Vorname;
+                                                            ITS=Nome;
+                                                            FRS=PrÇnom] }
+    { 1109400009;TextBox;3740 ;9240 ;5500 ;440  ;Editable=No;
+                                                 Focusable=No;
+                                                 SourceExpr=fldContactCountryCodeG }
+    { 1109400010;Label  ;220  ;8250 ;3300 ;440   }
+    { 1109400011;Label  ;330  ;9240 ;3300 ;440  ;CaptionML=[ENU=Country Code;
+                                                            DES=Land] }
+    { 1109400001;TextBox;13970;9020 ;5500 ;440  ;Name=fldProspCityG;
+                                                 CaptionML=[DEU=Ort;
+                                                            ENU=Country Code;
+                                                            DES=Ort;
+                                                            ITS=Luogo;
+                                                            FRS=Ville];
+                                                 SourceExpr=fldProspCountryCodeG }
+    { 1109400002;Label  ;10560;9020 ;3300 ;440  ;CaptionML=[ENU=Country Code;
+                                                            DES=" Land"] }
+    { 1109400012;CommandButton;9570;14850;770;660;
+                                                 Name=ButBusinessEmailG;
+                                                 ShowCaption=No;
+                                                 Bitmap=1290;
+                                                 OnPush=BEGIN
+                                                          ProspectG.VALIDATE("E-Mail",Rec."E-Mail");
+                                                          ShowProspectFields;
+                                                        END;
+                                                         }
+    { 1109400013;Label  ;330  ;12650;3300 ;440  ;CaptionML=[ENU=Phone No.;
+                                                            DES=Telefon] }
   }
   CODE
   {
     VAR
-      recProspectG@1117900000 : Record 5047087;
-      recCRMProspRelG@1117900019 : Record 5068137;
+      ProspectG@1117900000 : Record 5047087;
+      AIHContactTempG@1109400000 : Record 5045160;
       fncValidateProspectG@1117900017 : Codeunit 5069931;
       fldProspNoG@1117900001 : Code[20];
       fldProspFirstNameG@1117900002 : Text[30];
+      fldProspSearchNameG@1109400020 : Text[30];
       fldProspLastNameG@1117900003 : Text[30];
       fldProspStreetG@1117900004 : Text[30];
       fldProspHouseG@1117900005 : Text[10];
       fldProspAddr2G@1117900006 : Text[30];
       fldProspPostCodeG@1117900007 : Code[20];
       fldProspCityG@1117900008 : Text[30];
+      fldProspCountryCodeG@1109400018 : Text[30];
       fldProspHomePhoneG@1117900009 : Text[30];
       fldProspHomeFaxG@1117900010 : Text[30];
       fldProspHomeMobileG@1117900011 : Text[30];
@@ -670,33 +656,65 @@ OBJECT Form 5045160 AIH Comparison
       fldProspFaxNoG@1117900014 : Text[30];
       fldProspMobileG@1117900015 : Text[30];
       fldProspEmailG@1117900016 : Text[80];
-      fldCARMENIDG@1117900018 : Text[30];
+      fldContactNoG@1109400016 : Code[20];
+      fldContactFirstNameG@1109400015 : Text[30];
+      fldContactSearchNameG@1109400019 : Text[30];
+      fldContactLastNameG@1109400014 : Text[30];
+      fldContactStreetG@1109400013 : Text[30];
+      fldContactHouseG@1109400012 : Text[10];
+      fldContactAddr2G@1109400011 : Text[30];
+      fldContactCountryCodeG@1109400017 : Code[20];
+      fldContactPostCodeG@1109400010 : Code[20];
+      fldContactCityG@1109400009 : Text[30];
+      fldContactHomePhoneG@1109400008 : Text[30];
+      fldContactHomeFaxG@1109400007 : Text[30];
+      fldContactHomeMobileG@1109400006 : Text[30];
+      fldContactHomeEmailG@1109400005 : Text[80];
+      fldContactPhoneNoG@1109400004 : Text[30];
+      fldContactFaxNoG@1109400003 : Text[30];
+      fldContactMobileG@1109400002 : Text[30];
+      fldContactEmailG@1109400001 : Text[80];
 
-    PROCEDURE fncShowProspectFieldsG@1117900000();
+    PROCEDURE ShowAutoiFields@1109400001();
     BEGIN
-      fldProspNoG := recProspectG."No.";
-      fldProspFirstNameG := recProspectG."First Name";
-      fldProspLastNameG := recProspectG."Last Name";
-      fldProspStreetG := recProspectG.Street;
-      fldProspHouseG := recProspectG."House No.";
-      fldProspAddr2G := recProspectG."Address 2";
-      fldProspPostCodeG := recProspectG."Post Code";
-      fldProspCityG := recProspectG.City;
-      fldProspHomePhoneG := recProspectG."Home Phone No.";
-      fldProspHomeFaxG := recProspectG."Home Fax No.";
-      fldProspHomeMobileG := recProspectG."Home Mobile Phone No.";
-      fldProspHomeEmailG := recProspectG."Home E-Mail";
-      fldProspPhoneNoG := recProspectG."Phone No.";
-      fldProspFaxNoG := recProspectG."Fax No.";
-      fldProspMobileG := recProspectG."Mobile Phone No.";
-      fldProspEmailG := recProspectG."E-Mail";
-      recCRMProspRelG.RESET;
-      recCRMProspRelG.SETCURRENTKEY("Prospect No.");
-      recCRMProspRelG.SETRANGE("Prospect No.",recProspectG."No.");
-      IF recCRMProspRelG.FIND('-') THEN
-        fldCARMENIDG := recCRMProspRelG."CARMEN ID"
-      ELSE
-        fldCARMENIDG := '';
+      fldContactNoG := AIHContactTempG."Prospect No.";
+      fldContactFirstNameG := AIHContactTempG."First Name";
+      fldProspSearchNameG := AIHContactTempG."Search Name";
+      fldContactLastNameG := AIHContactTempG."Last Name";
+      fldContactStreetG := AIHContactTempG."Address 2";
+      fldContactAddr2G := AIHContactTempG."Address 2";
+      fldContactPostCodeG := AIHContactTempG."Post Code";
+      fldContactCityG := AIHContactTempG.City;
+      fldContactCountryCodeG := AIHContactTempG."Country Code";
+      fldContactHomePhoneG := AIHContactTempG."Home Phone No.";
+      fldContactHomeFaxG := AIHContactTempG."Home Fax No.";
+      fldContactHomeMobileG := AIHContactTempG."Home Mobile Phone No.";
+      fldContactHomeEmailG := AIHContactTempG."Home E-Mail";
+      fldContactPhoneNoG := AIHContactTempG."Phone No.";
+      fldContactFaxNoG := AIHContactTempG."Fax No.";
+      fldContactMobileG := AIHContactTempG."Mobile Phone No.";
+      fldContactEmailG := AIHContactTempG."E-Mail";
+    END;
+
+    PROCEDURE ShowProspectFields@1117900000();
+    BEGIN
+      fldProspNoG := ProspectG."No.";
+      fldProspFirstNameG := ProspectG."First Name";
+      fldProspSearchNameG := ProspectG."Search Name";
+      fldProspLastNameG := ProspectG."Last Name";
+      fldProspStreetG := ProspectG.Street;
+      fldProspAddr2G := ProspectG."Address 2";
+      fldProspPostCodeG := ProspectG."Post Code";
+      fldProspCountryCodeG := ProspectG."Country Code";
+      fldProspCityG := ProspectG.City;
+      fldProspHomePhoneG := ProspectG."Home Phone No.";
+      fldProspHomeFaxG := ProspectG."Home Fax No.";
+      fldProspHomeMobileG := ProspectG."Home Mobile Phone No.";
+      fldProspHomeEmailG := ProspectG."Home E-Mail";
+      fldProspPhoneNoG := ProspectG."Phone No.";
+      fldProspFaxNoG := ProspectG."Fax No.";
+      fldProspMobileG := ProspectG."Mobile Phone No.";
+      fldProspEmailG := ProspectG."E-Mail";
     END;
 
     BEGIN
@@ -709,12 +727,10 @@ OBJECT Form 5045160 AIH Comparison
       |PA-Number   Date                              |
       +----------------------------------------------+
 
-       CLCH045     14.05.2025   HAB   AutoIHandel
-                                Reas: Integration von Auto-I-Handel Datenbank
-                                      Kunden Import Form //Detaillierten schreiben
-                                Othe: neues Objekt
-    }
-	
+             CLCH045     14.05.2025   HAB   AutoIHandel
+                                      Reas: Integration von Auto-I-Handel Datenbank
+                                            Kunden Import Form //Detaillierten schreiben
+                                      Othe: neues Objekt
     }
     END.
   }

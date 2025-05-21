@@ -2,8 +2,8 @@ OBJECT Form 5047077 Contact Card
 {
   OBJECT-PROPERTIES
   {
-    Date=19.05.25;
-    Time=08:09:22;
+    Date=20.05.25;
+    Time=09:15:48;
     Modified=Yes;
     Version List=HAB;
   }
@@ -52,7 +52,7 @@ OBJECT Form 5047077 Contact Card
                                                  PageNamesML=[ENU=General,Communication,Segmentation,Free,Statistic;
                                                               DES=Allgemein,Kommunikation,Bereich,Frei,Statistik;
                                                               ITS=Generale,Comunicazione,Segmentazione,Libero,Statistico;
-                                                              FRS=G n ral,Communication,Segments,Libre,Statistique] }
+                                                              FRS=GÇnÇral,Communication,Segments,Libre,Statistique] }
     { 18  ;TextBox      ;3850 ;4840 ;5500 ;440  ;ParentControl=1;
                                                  InPage=0;
                                                  SourceExpr="Address 2" }
@@ -64,7 +64,7 @@ OBJECT Form 5047077 Contact Card
     { 21  ;Label        ;440  ;5390 ;3300 ;440  ;ParentControl=20;
                                                  CaptionML=[ENU=Post Code/City;
                                                             DES=PLZ Code/Ort;
-                                                            ITS=CAP/Citt ;
+                                                            ITS=CAP/CittÖ;
                                                             FRS=CP/Ville] }
     { 22  ;TextBox      ;6710 ;5390 ;2640 ;440  ;ParentControl=1;
                                                  InPage=0;
@@ -172,9 +172,9 @@ OBJECT Form 5047077 Contact Card
                                                  SourceExpr=Street }
     { 1117700001;Label  ;440  ;4290 ;3300 ;440  ;ParentControl=1117700002;
                                                  CaptionML=[ENU=Street / House No.;
-                                                            DES=Stra e / Hausnr.;
+                                                            DES=Stra·e / Hausnr.;
                                                             ITS=Indirizzo / No. Civico;
-                                                            FRS=Rue / N  domic.];
+                                                            FRS=Rue / N¯ domic.];
                                                  Description=PA022459.BMW }
     { 27  ;TextBox      ;3850 ;990  ;4950 ;440  ;ParentControl=1;
                                                  InPage=1;
@@ -363,7 +363,7 @@ OBJECT Form 5047077 Contact Card
                                                      PushAction=LookupTable;
                                                      ShortCutKey=F5;
                                                      CaptionML=[ENU=&List;
-                                                                DES= bersic&ht;
+                                                                DES=öbersic&ht;
                                                                 ITS=E&lenco;
                                                                 FRS=&Lister] }
                                                    { ID=56;
@@ -380,7 +380,7 @@ OBJECT Form 5047077 Contact Card
                                                      CaptionML=[ENU=Market &Groups;
                                                                 DES=In&teressengruppen;
                                                                 ITS=Gruppi mercato;
-                                                                FRS=Groupes march s];
+                                                                FRS=Groupes marchÇs];
                                                      RunObject=Form 5047093;
                                                      RunFormLinkType=OnUpdate;
                                                      RunFormLink=Prospect No.=FIELD(Prospect No.),
@@ -411,7 +411,7 @@ OBJECT Form 5047077 Contact Card
                                                      ShortCutKey=Ctrl+F5;
                                                      CaptionML=[ENU=Act&ivities;
                                                                 DES=Aktionen;
-                                                                ITS=A&ttivit ;
+                                                                ITS=A&ttivitÖ;
                                                                 FRS=&Actions];
                                                      RunObject=Form 5047087;
                                                      RunFormLinkType=OnUpdate;
@@ -454,8 +454,8 @@ OBJECT Form 5047077 Contact Card
                                                      Ellipsis=Yes;
                                                      CaptionML=[ENU=Create &Recurring Activity;
                                                                 DES=Wiederkehrende Aktion erstellen;
-                                                                ITS=Crea attivit  &ricorrente;
-                                                                FRS=Cr er Actions p riodiques];
+                                                                ITS=Crea attivitÖ &ricorrente;
+                                                                FRS=CrÇer Actions pÇriodiques];
                                                      OnPush=BEGIN
                                                               CLEAR(CreateRecurringActivity);
                                                               CreateRecurringActivity.SetContact(Rec);
@@ -507,12 +507,6 @@ OBJECT Form 5047077 Contact Card
 
     BEGIN
     {
-      NSCH ------------------------------------------+
-      SS48
-      01.04.00/NSCH/CH - Felder neu angeordnet                                      //TL  nderung nicht  bernommen
-      06.11.00/NSCH/CH - Property InsertAllowed auf Ja gestellt
-      08.05.01/NSCH/CH - Men  Funktion, Kurzbrief drucken: Reportaufruf ge ndert
-
       +----------------------------------------------+
       | Copyright (c) 2010 Incadea GmbH              |
       +----------------------------------------------+
@@ -524,11 +518,10 @@ OBJECT Form 5047077 Contact Card
 
 
       --- BMW ---
-      PA022459.BMW 03.02.04 md Anzeige der neuen Felder "Stra e" & "Hausnummer" anstelle des Feldes "Adresse"
+      PA022459.BMW 03.02.04 md Anzeige der neuen Felder "Stra·e" & "Hausnummer" anstelle des Feldes "Adresse"
       PA031554.BMW 13.01.10  Object renumbering changes due to Microsoft Agreement.
 
-      --- HAB ---
-      CLCH HAB 15.05.2025 Neue Funktionen erstellt AutoIHandel Senden und Empfangen
+      CLCH HAB 12.05.25 Neue Funktion AutoIHandel hinzugefÅt
     }
     END.
   }

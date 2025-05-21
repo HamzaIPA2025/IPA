@@ -2,161 +2,14 @@ OBJECT Table 5045160 AIH Contact Temp
 {
   OBJECT-PROPERTIES
   {
-    Date=19.05.25;
-    Time=09:44:08;
+    Date=21.05.25;
+    Time=16:57:35;
     Modified=Yes;
     Version List=HAB;
   }
   PROPERTIES
   {
     DataCaptionFields=No.,Name;
-    OnInsert=BEGIN
-               IF "No." = '' THEN
-                 InsertRecord;
-
-
-               //SS48
-               //*M01* Start
-               //DatensatzEinf;
-               //*M01* End
-               "Angelegt von" := USERID;
-               "Angelegt am" := TODAY;
-               //SS48 END
-             END;
-
-    OnModify=BEGIN
-               "Last Date Modified" := TODAY;
-
-               TESTFIELD("Last Name");
-               IF "Address No." = 0 THEN
-                 AddressManagement.CheckContactAddress(Rec, FALSE);
-               // Start PA021546
-               IF ("Address Salutation Code" <> xRec."Address Salutation Code") OR
-                  (Address <> xRec.Address) OR
-               /// Start PA022459.BMW
-                  (Street <> xRec.Street) OR
-                  ("House No." <> xRec."House No.") OR
-               /// Stop PA022459.BMW
-                  ("Address 2" <> xRec."Address 2") OR
-                  ("Letter Salutation Code" <> xRec."Letter Salutation Code") OR
-                  (County <> xRec.County) OR
-                  ("E-Mail" <> xRec."E-Mail") OR
-                  ("Home E-Mail" <> xRec."Home E-Mail") OR
-                  ("Fax No." <> xRec."Fax No.") OR
-                  ("Home Fax No." <> xRec."Home Fax No.") OR
-                  ("Job Title" <> xRec."Job Title") OR
-                  ("Home Page" <> xRec."Home Page") OR
-                  ("Home Page 2" <> xRec."Home Page 2") OR
-                  ("Customer Type" <> xRec."Customer Type") OR
-                  ("Country Code" <> xRec."Country Code") OR
-                  ("Mobile Phone No." <> xRec."Mobile Phone No.") OR
-                  ("Home Mobile Phone No." <> xRec."Home Mobile Phone No.") OR
-                  ("Last Name" <> xRec."Last Name") OR
-                  (Name <> xRec.Name) OR
-                  ("Name 2" <> xRec."Name 2") OR
-                  (City <> xRec.City) OR
-                  ("Post Code" <> xRec."Post Code") OR
-                  ("Language Code" <> xRec."Language Code") OR
-                  ("Search Name" <> xRec."Search Name") OR
-                  ("Phone No." <> xRec."Phone No.") OR
-                  ("Home Phone No." <> xRec."Home Phone No.") OR
-                  ("Title Code" <> xRec."Title Code") OR
-                  ("First Name" <> xRec."First Name")
-               // Stop PA021546
-               THEN BEGIN
-                 "Date of Update" := TODAY;
-                 "Time of Update" := TIME;
-                 "Updated by User ID" := USERID;
-                 "Update Company" := COMPANYNAME;
-                 AddressManagement.UpdateContactAddress(Rec);
-               END;
-               // Start PA021336.BMW
-               BmwRecStatus.StoreStatus("Prospect No.", "No.", BmwRecStatus.Table::Contact,
-                 BmwRecStatus."Current Record Status"::Modification);
-               // Stop PA021336.BMW
-             END;
-
-    OnDelete=BEGIN
-               ContMgtCommentLine.SETRANGE("Table Name",ContMgtCommentLine."Table Name"::Contact);
-               ContMgtCommentLine.SETRANGE("Prospect No.","Prospect No.");
-               ContMgtCommentLine.SETRANGE("Table Code","No.");
-               ContMgtCommentLine.DELETEALL;
-
-               CampaignLine.SETCURRENTKEY("Prospect No.","Contact No.");
-               CampaignLine.SETRANGE("Prospect No.","Prospect No.");
-               CampaignLine.SETRANGE("Contact No.","No.");
-               CampaignLine.DELETEALL;
-
-               ProsptContMarketGroup.SETRANGE("Prospect No.","Prospect No.");
-               ProsptContMarketGroup.SETRANGE("Contact No.","No.");
-               ProsptContMarketGroup.DELETEALL;
-
-               Activity.SETCURRENTKEY("Prospect No.","Contact No.");
-               Activity.SETRANGE("Prospect No.","Prospect No.");
-               Activity.SETRANGE("Contact No.","No.");
-               Activity.MODIFYALL("Contact No.",'');
-               //INC2.00
-               AddressManagement.DeleteAddressLink("Address No.","Prospect No.","No.",7);
-               //INC2.00
-               // Start PA021336.BMW
-               BmwRecStatus.StoreStatus("Prospect No.", "No.", BmwRecStatus.Table::Contact,
-                 BmwRecStatus."Current Record Status"::Deletion);
-               // Stop PA021336.BMW
-
-               //DO1.05
-               Dokument.SETRANGE("Company No.","Prospect No.");
-               Dokument.SETRANGE("Contact No.","No.");
-               IF Dokument.FIND('-') THEN
-                 REPEAT
-                   Dokument.FillLetterFields(TRUE);
-                   Dokument.DELETE;
-                 UNTIL Dokument.NEXT = 0;
-             END;
-
-    OnRename=BEGIN
-               "Last Date Modified" := TODAY;
-
-               IF "Prospect No." <> xRec."Prospect No." THEN BEGIN
-                 Prospt.GET("Prospect No.");
-                 IF Prospt."Last Contact No." = '' THEN
-                   Prospt."Last Contact No." := '1'
-                 ELSE
-                   Prospt."Last Contact No." := INCSTR(Prospt."Last Contact No.");
-                 Prospt.MODIFY;
-                 "No." := Prospt."Last Contact No.";
-
-                 ContMgtCommentLine.SETRANGE("Table Name",ContMgtCommentLine."Table Name"::Contact);
-                 ContMgtCommentLine.SETRANGE("Prospect No.",xRec."Prospect No.");
-                 ContMgtCommentLine.SETRANGE("Table Code",xRec."No.");
-               // Start PA024602
-                 //WHILE ContMgtCommentLine.FIND('-') DO
-                 IF ContMgtCommentLine.FIND('-') THEN
-                   REPEAT
-               // Stop PA024602
-                   ContMgtCommentLine.RENAME(ContMgtCommentLine."Table Name"::Contact,"Prospect No.",0,"No.");
-               // Start PA024602
-                   UNTIL ContMgtCommentLine.NEXT=0;
-               // Stop PA024602
-                 ProsptContMarketGroup.SETRANGE("Prospect No.",xRec."Prospect No.");
-                 ProsptContMarketGroup.SETRANGE("Contact No.",xRec."No.");
-               // Start PA024602
-               //    WHILE ProsptContMarketGroup.FIND('-') DO BEGIN
-                 IF ProsptContMarketGroup.FIND('-') THEN
-                   REPEAT
-               // Stop PA024602
-                   ProsptContMarketGroup.DELETE;
-                   ProsptContMarketGroup."Contact No." := '';
-                   IF ProsptContMarketGroup.INSERT THEN;
-               // Start PA024602
-               //  END;
-                   UNTIL ProsptContMarketGroup.NEXT=0;
-               // Stop PA024602
-                 Activity.SETCURRENTKEY("Prospect No.");
-                 Activity.SETRANGE("Prospect No.",xRec."Prospect No.");
-                 Activity.MODIFYALL("Contact No.",'');
-               END;
-             END;
-
     CaptionML=[DEU=Kontaktperson;
                ENU=Contact;
                DES=Kontaktperson;
@@ -179,33 +32,14 @@ OBJECT Table 5045160 AIH Contact Temp
                                                               ENU=No.;
                                                               DES=Nr.;
                                                               ITS=Codice;
-                                                              FRS=N ];
+                                                              FRS="N "];
                                                    Editable=No }
-    { 3   ;   ;Title               ;Text20        ;OnValidate=BEGIN
-                                                                UpdateSalutation;
-                                                              END;
-
-                                                   CaptionML=[DEU=Titel;
+    { 3   ;   ;Title               ;Text20        ;CaptionML=[DEU=Titel;
                                                               ENU=Title;
                                                               DES=Titel;
                                                               ITS=Titolo;
                                                               FRS=Titre] }
-    { 4   ;   ;Name                ;Text30        ;OnValidate=BEGIN
-                                                                //INC2.00
-                                                                OldSearchtext := COPYSTR(STRSUBSTNO('%1 %2',xRec."Last Name",xRec."First Name"),1,30);
-                                                                IF ("Search Name" = OldSearchtext) OR ("Search Name" = '') THEN
-                                                                  "Search Name" := COPYSTR(STRSUBSTNO('%1 %2',"Last Name","First Name"),1,30);
-                                                                //INC2.00
-
-                                                                UpdateSalutation;
-
-                                                                //INC2.30 START
-                                                                IF "Address No." = 0 THEN
-                                                                  AddressManagement.CheckContactAddress(Rec, (CurrFieldNo <> 0));
-                                                                //INC2.30 STOP
-                                                              END;
-
-                                                   CaptionML=[DEU=Name;
+    { 4   ;   ;Name                ;Text30        ;CaptionML=[DEU=Name;
                                                               ENU=Name;
                                                               DES=Name;
                                                               ITS=Nome;
@@ -231,11 +65,6 @@ OBJECT Table 5045160 AIH Contact Temp
                                                               ITS=Indirizzo 2;
                                                               FRS=Adresse 2] }
     { 9   ;   ;Post Code           ;Code20        ;TableRelation="Post Code";
-                                                   OnValidate=BEGIN
-                                                                IF PostCode.GET("Post Code") THEN
-                                                                  City := PostCode.City;
-                                                              END;
-
                                                    ValidateTableRelation=No;
                                                    TestTableRelation=No;
                                                    CaptionML=[DEU=PLZ Code;
@@ -246,7 +75,7 @@ OBJECT Table 5045160 AIH Contact Temp
     { 10  ;   ;City                ;Text30        ;CaptionML=[DEU=Ort;
                                                               ENU=City;
                                                               DES=Ort;
-                                                              ITS=Citt ;
+                                                              ITS="Citt ";
                                                               FRS=Ville] }
     { 11  ;   ;County              ;Text30        ;CaptionML=[DEU=Bundesregion;
                                                               ENU=County;
@@ -259,91 +88,43 @@ OBJECT Table 5045160 AIH Contact Temp
                                                               DES=L ndercode;
                                                               ITS=Cod. Paese;
                                                               FRS=Code pays] }
-    { 13  ;   ;Job Title           ;Text30        ;OnValidate=BEGIN
-                                                                UpdateSalutation;
-                                                              END;
-
-                                                   CaptionML=[DEU=Funktion;
+    { 13  ;   ;Job Title           ;Text30        ;CaptionML=[DEU=Funktion;
                                                               ENU=Job Title;
                                                               DES=Funktion;
                                                               ITS=Impiego;
                                                               FRS=Fonction] }
     { 14  ;   ;Job Responsibility Code;Code10     ;TableRelation="Contact Job Responsibility";
-                                                   OnValidate=BEGIN
-                                                                IF "Job Responsibility Code" <> '' THEN BEGIN
-                                                                  ContJobResponsibility.GET("Job Responsibility Code");
-                                                                  "Include in Campaigns" := ContJobResponsibility."Include in Campaigns";
-                                                                END;
-                                                              END;
-
                                                    CaptionML=[DEU=Verantwortlichkeitscode;
                                                               ENU=Job Responsibility Code;
                                                               DES=Verantwortlichkeitscode;
                                                               ITS=Cod. Responsabilit  Comm.;
                                                               FRS=Code responsabilit  t che] }
-    { 15  ;   ;Responsibility Level;Option        ;CaptionML=[DEU=Verantwortungsebene;
-                                                              ENU=Responsibility Level;
-                                                              DES=Verantwortungsebene;
-                                                              ITS=Livello di Responsabilit ;
-                                                              FRS=Niveau responsabilit ];
-                                                   OptionCaptionML=[DEU=Mitarbeiter,Abteilungsleiter,Manager,Gesch ftsf hrer;
-                                                                    ENU=Staff,Supervisor,Manager,Executive;
-                                                                    DES=Mitarbeiter,Abteilungsleiter,Manager,Gesch ftsf hrer;
-                                                                    ITS=Staff,Supervisore,Manager,Direttore;
-                                                                    FRS=Collaborateur,Chef groupe,Directeur,Administrateur];
-                                                   OptionString=Staff,Supervisor,Manager,Executive }
     { 16  ;   ;Primary Contact     ;Boolean       ;InitValue=Yes;
                                                    CaptionML=[DEU=Prim re Kontaktperson;
                                                               ENU=Primary Contact;
                                                               DES=Prim re Kontaktperson;
                                                               ITS=Contatto Principale;
                                                               FRS=Contact principal] }
-    { 17  ;   ;Phone No.           ;Text30        ;OnValidate=BEGIN
-                                                                //SS48
-                                                                Prospt.TelNrPr fen("Phone No.");
-                                                              END;
-
-                                                   CaptionML=[DEU=Telefon gesch ftlich;
+    { 17  ;   ;Phone No.           ;Text30        ;CaptionML=[DEU=Telefon gesch ftlich;
                                                               ENU=Phone No.;
                                                               DES=Telefon gesch ftlich;
                                                               ITS=Telefono;
                                                               FRS=N  t l. prof.] }
-    { 18  ;   ;Fax No.             ;Text30        ;OnValidate=BEGIN
-                                                                //SS48
-                                                                Prospt.TelNrPr fen("Fax No.");
-                                                              END;
-
-                                                   CaptionML=[DEU=Fax gesch ftlich;
+    { 18  ;   ;Fax No.             ;Text30        ;CaptionML=[DEU=Fax gesch ftlich;
                                                               ENU=Fax No.;
                                                               DES=Fax gesch ftlich;
                                                               ITS=Fax;
                                                               FRS=N  fax prof.] }
-    { 19  ;   ;Mobile Phone No.    ;Text30        ;OnValidate=BEGIN
-                                                                //SS48
-                                                                Prospt.TelNrPr fen("Mobile Phone No.");
-                                                              END;
-
-                                                   CaptionML=[DEU=Mobiltelefon gesch ftlich;
+    { 19  ;   ;Mobile Phone No.    ;Text30        ;CaptionML=[DEU=Mobiltelefon gesch ftlich;
                                                               ENU=Mobile Phone No.;
                                                               DES=Mobiltelefon gesch ftlich;
                                                               ITS=Cellulare Aziendale;
                                                               FRS=N  t l. mobile prof.] }
-    { 20  ;   ;Home Phone No.      ;Text30        ;OnValidate=BEGIN
-                                                                //SS48
-                                                                Prospt.TelNrPr fen("Home Phone No.");
-                                                              END;
-
-                                                   CaptionML=[DEU=Telefon privat;
+    { 20  ;   ;Home Phone No.      ;Text30        ;CaptionML=[DEU=Telefon privat;
                                                               ENU=Home Phone No.;
                                                               DES=Telefon privat;
                                                               ITS=Telefono;
-                                                              FRS=N  t l. priv ] }
-    { 21  ;   ;Language Code       ;Code10        ;TableRelation=Language;
-                                                   CaptionML=[DEU=Sprachcode;
-                                                              ENU=Language Code;
-                                                              DES=Sprachcode;
-                                                              ITS=Cod. Lingua;
-                                                              FRS=Code langue] }
+                                                              FRS="N  t l. priv "] }
     { 22  ;   ;Include in Campaigns;Boolean       ;InitValue=Yes;
                                                    CaptionML=[DEU=Enthalten in Kampagnen;
                                                               ENU=Include in Campaigns;
@@ -355,12 +136,6 @@ OBJECT Table 5045160 AIH Contact Temp
                                                               DES=Adresse verwenden;
                                                               ITS=Usa Indirizzo Contatto;
                                                               FRS=Utiliser adresse contact] }
-    { 24  ;   ;Salesperson Code    ;Code10        ;TableRelation=Salesperson/Purchaser;
-                                                   CaptionML=[DEU=Verk ufercode;
-                                                              ENU=Salesperson Code;
-                                                              DES=Verk ufercode;
-                                                              ITS=Cod. Venditore;
-                                                              FRS=Code vendeur] }
     { 25  ;   ;E-Mail              ;Text80        ;CaptionML=[DEU=Email gesch ftlich;
                                                               ENU=E-Mail;
                                                               DES=Email gesch ftlich;
@@ -379,7 +154,7 @@ OBJECT Table 5045160 AIH Contact Temp
                                                    CaptionML=[DEU=Datum letzte Aktion;
                                                               ENU=Last Activity Date;
                                                               DES=Datum letzte Aktion;
-                                                              ITS=Data Ultima Attivit ;
+                                                              ITS="Data Ultima Attivit ";
                                                               FRS=Date derni re action];
                                                    Editable=No }
     { 29  ;   ;Next Activity Date  ;Date          ;FieldClass=FlowField;
@@ -389,7 +164,7 @@ OBJECT Table 5045160 AIH Contact Temp
                                                    CaptionML=[DEU=Datum n chste Aktion;
                                                               ENU=Next Activity Date;
                                                               DES=Datum n chste Aktion;
-                                                              ITS=Data Prossima Attivit ;
+                                                              ITS="Data Prossima Attivit ";
                                                               FRS=Date prochaine action];
                                                    Editable=No }
     { 30  ;   ;Comment             ;Boolean       ;FieldClass=FlowField;
@@ -409,7 +184,7 @@ OBJECT Table 5045160 AIH Contact Temp
                                                               ENU=Market Groups;
                                                               DES=Interessengruppen;
                                                               ITS=Gruppi Mercato;
-                                                              FRS=Groupes march ];
+                                                              FRS="Groupes march "];
                                                    Editable=No }
     { 32  ;   ;Picture             ;BLOB          ;CaptionML=[DEU=Bild;
                                                               ENU=Picture;
@@ -425,127 +200,18 @@ OBJECT Table 5045160 AIH Contact Temp
                                                               ITS=Nome Interessato;
                                                               FRS=Nom Prospect];
                                                    Editable=No }
-    { 92000;  ;Mailing             ;Boolean       ;CaptionML=[DES=Mailing;
-                                                              ITS=Spedizione;
-                                                              FRS=Mailing] }
-    { 92001;  ;Geschenk            ;Boolean       ;CaptionML=[DES=Geschenk;
-                                                              ITS=Regalo;
-                                                              FRS=Cadeau] }
-    { 92002;  ;Weihnacht           ;Boolean       ;CaptionML=[DES=Weihnacht;
-                                                              ITS=Natale;
-                                                              FRS=No l] }
-    { 92003;  ;Messe               ;Boolean       ;CaptionML=[DES=Messe;
-                                                              ITS=Giusto;
-                                                              FRS=Foire] }
-    { 92004;  ;VIP                 ;Boolean       ;CaptionML=[DES=VIP;
-                                                              ITS=VIP;
-                                                              FRS=VIP] }
-    { 92005;  ;Kategorie A         ;Boolean       ;CaptionML=[DES=Kategorie A;
-                                                              ITS=Categoria A;
-                                                              FRS=Cat gorie A] }
-    { 92006;  ;Kategorie B         ;Boolean       ;CaptionML=[DES=Kategorie B;
-                                                              ITS=Categoria B;
-                                                              FRS=Cat gorie B] }
-    { 92007;  ;Kategorie C         ;Boolean       ;CaptionML=[DES=Kategorie C;
-                                                              ITS=Categoria C;
-                                                              FRS=Cat gorie C] }
-    { 92008;  ;Kategorie D         ;Boolean       ;CaptionML=[DES=Kategorie D;
-                                                              ITS=Categoria D;
-                                                              FRS=Cat gorie D] }
-    { 92009;  ;Kategorie E         ;Boolean       ;CaptionML=[DES=Kategorie E;
-                                                              ITS=Categoria E;
-                                                              FRS=Cat gorie E] }
-    { 92018;  ;Anzahl Kampagnezeilen;Integer      ;FieldClass=FlowField;
-                                                   CalcFormula=Count("Campaign Line" WHERE (Prospect No.=FIELD(Prospect No.),
-                                                                                            Contact No.=FIELD(No.)));
-                                                   CaptionML=[DES=Anzahl Kampagnezeilen;
-                                                              ITS=Numero di linee di campagna;
-                                                              FRS=nombre lignes campagne];
-                                                   Editable=No }
-    { 92021;  ;Gruppe              ;Option        ;CaptionML=[DES=Gruppe;
-                                                              ITS=Gruppo;
-                                                              FRS=Nom du groupe];
-                                                   OptionCaptionML=[DES=" ,A,B,C,D,E,F,G,H,I,K";
-                                                                    ITS=" ,A,B,C,D,E,F,G,H,I,K";
-                                                                    FRS=" ,A,B,C,D,E,F,G,H,I,K"];
-                                                   OptionString=[ ,A,B,C,D,E,F,G,H,I,K] }
-    { 92022;  ;Bewertung           ;Option        ;CaptionML=[DES=Bewertung;
-                                                              ITS=Valutazione;
-                                                              FRS=Appr ciation];
-                                                   OptionCaptionML=[DES=" ,schlecht,tief,mittel,hoch,super";
-                                                                    ITS=" ,male,profondamente,mezzi,altamente,eccellente";
-                                                                    FRS=" ,mal,profond ment,moyen,haut,super"];
-                                                   OptionString=[ ,schlecht,tief,mittel,hoch,super] }
-    { 92023;  ;Abteilung           ;Code20        ;CaptionML=[DES=Abteilung;
-                                                              ITS=Divisione;
-                                                              FRS=Partie d'entreprise] }
-    { 92024;  ;Kurztext            ;Text120       ;CaptionML=[DES=Kurztext;
-                                                              ITS=Sommario;
-                                                              FRS=T xte cour] }
-    { 92032;  ;Angelegt am         ;Date          ;CaptionML=[DES=Angelegt am;
-                                                              ITS=Compilato al;
-                                                              FRS=Date de cr ation];
-                                                   Editable=No }
-    { 92034;  ;Angelegt von        ;Code20        ;TableRelation=User;
-                                                   CaptionML=[DES=Angelegt von;
-                                                              ITS=Compilato da;
-                                                              FRS=Cr   par];
-                                                   Editable=No }
-    { 92050;  ;Pager               ;Text30        ;CaptionML=[DES=Pager;
-                                                              ITS=Pager;
-                                                              FRS=Pager] }
-    { 92052;  ;Geburtsdatum        ;Date          ;CaptionML=[ENU=Date of Birth;
-                                                              DES=Geburtsdatum;
-                                                              ITS=Data di nascit ;
-                                                              FRS=Date naissance] }
     { 5025350;;Address No.         ;Integer       ;TableRelation=Address;
                                                    CaptionML=[DEU=Adressnr.;
                                                               ENU=Address No.;
                                                               DES=Adressnr.;
                                                               ITS=Nr. Indirizzo;
                                                               FRS=N  Adresse] }
-    { 5025351;;Date of Update      ;Date          ;CaptionML=[DEU=Updatedatum;
-                                                              ENU=Date of Update;
-                                                              DES=Updatedatum;
-                                                              ITS=Aggiorna Data;
-                                                              FRS=Mise   jour date] }
-    { 5025352;;Time of Update      ;Time          ;CaptionML=[DEU=Updatezeit;
-                                                              ENU=Time of Update;
-                                                              DES=Updatezeit;
-                                                              ITS=Aggiorna Ora;
-                                                              FRS=Mise   jour heure] }
-    { 5025353;;Updated by User ID  ;Code20        ;TableRelation=User;
-                                                   CaptionML=[DEU=Update Benutzer ID;
-                                                              ENU=Updated by User ID;
-                                                              DES=Update Benutzer ID;
-                                                              ITS=Aggiornare ID Utente;
-                                                              FRS=Mise   jour ID utilis.] }
-    { 5025354;;Update Company      ;Text30        ;TableRelation=Company;
-                                                   CaptionML=[DEU=Updatemandant;
-                                                              ENU=Update Company;
-                                                              DES=Updatemandant;
-                                                              ITS=Aggiorna Societ ;
-                                                              FRS=Mise   jour soci t ] }
-    { 5025355;;Last Name           ;Text30        ;OnValidate=BEGIN
-                                                                //INC2.00
-                                                                IF "Last Name" <> xRec."Last Name" THEN
-                                                                  VALIDATE(Name,AddressManagement.CreateNameField('',"First Name","Last Name"));
-                                                                //INC2.00
-                                                              END;
-
-                                                   CaptionML=[DEU=Nachname;
+    { 5025355;;Last Name           ;Text30        ;CaptionML=[DEU=Nachname;
                                                               ENU=Last Name;
                                                               DES=Nachname;
                                                               ITS=Cognome;
                                                               FRS=Nom de famille] }
-    { 5025356;;First Name          ;Text30        ;OnValidate=BEGIN
-                                                                //INC2.00
-                                                                IF "First Name" <> xRec."First Name" THEN
-                                                                  VALIDATE(Name,AddressManagement.CreateNameField('',"First Name","Last Name"));
-                                                                //INC2.00
-                                                              END;
-
-                                                   CaptionML=[DEU=Vorname;
+    { 5025356;;First Name          ;Text30        ;CaptionML=[DEU=Vorname;
                                                               ENU=First Name;
                                                               DES=Vorname;
                                                               ITS=Nome;
@@ -556,17 +222,6 @@ OBJECT Table 5045160 AIH Contact Temp
                                                               ITS=Nome 2;
                                                               FRS=Nom 2] }
     { 5025358;;Address Salutation Code;Code10     ;TableRelation="Address Salutation";
-                                                   OnValidate=BEGIN
-                                                                //INC2.00
-                                                                IF "Address Salutation Code" <> xRec."Address Salutation Code" THEN
-                                                                  IF "Address Salutation Code" <> '' THEN BEGIN
-                                                                    AddressSalutation.GET("Address Salutation Code");
-                                                                    VALIDATE("Letter Salutation Code",AddressSalutation."Letter Salutation Code");
-                                                                    "Customer Type" := AddressSalutation."Customer Type";
-                                                                  END;
-                                                                //INC2.00
-                                                              END;
-
                                                    CaptionML=[DEU=Adressanredecode;
                                                               ENU=Address Salutation Code;
                                                               DES=Adressanredecode;
@@ -579,13 +234,6 @@ OBJECT Table 5045160 AIH Contact Temp
                                                               ITS=Cod. Lett. Form. Saluto;
                                                               FRS=Code salutation courrier] }
     { 5025360;;Title Code          ;Code10        ;TableRelation=Title;
-                                                   OnValidate=BEGIN
-                                                                //INC2.00
-                                                                IF TitleTab.GET("Title Code") THEN
-                                                                  Title := TitleTab.Description;
-                                                                //INC2.00
-                                                              END;
-
                                                    CaptionML=[DEU=Titelcode;
                                                               ENU=Title Code;
                                                               DES=Titelcode;
@@ -600,7 +248,7 @@ OBJECT Table 5045160 AIH Contact Temp
                                                                     ENU=Male,Female,Business;
                                                                     DES=M nnlich,Weiblich,Firma;
                                                                     ITS=Uomo,Donna,Azienda,Concessionaria,Dipendente;
-                                                                    FRS=Homme,Femme,Soci t ];
+                                                                    FRS="Homme,Femme,Soci t "];
                                                    OptionString=Male,Female,Business }
     { 5025363;;Home Page           ;Text80        ;CaptionML=[DEU=Homepage gesch ftlich;
                                                               ENU=Home Page;
@@ -611,116 +259,28 @@ OBJECT Table 5045160 AIH Contact Temp
                                                               ENU=Home Fax No.;
                                                               DES=Fax privat;
                                                               ITS=Fax Privato;
-                                                              FRS=N  fax priv ] }
+                                                              FRS="N  fax priv "] }
     { 5025365;;Home Mobile Phone No.;Text30       ;CaptionML=[DEU=Mobiltelefon privat;
                                                               ENU=Home Mobile Phone No.;
                                                               DES=Mobiltelefon privat;
                                                               ITS=Cellulare Privato;
-                                                              FRS=N  t l. mobile priv ] }
+                                                              FRS="N  t l. mobile priv "] }
     { 5025366;;Home E-Mail         ;Text80        ;CaptionML=[DEU=Email privat;
                                                               ENU=Home E-Mail;
                                                               DES=Email privat;
                                                               ITS=email privata;
-                                                              FRS=E-mail priv ] }
-    { 5025367;;Home Page 2         ;Text80        ;CaptionML=[DEU=Homepage privat;
-                                                              ENU=Home Page 2;
-                                                              DES=Homepage privat;
-                                                              ITS=Home Page Privata;
-                                                              FRS=Page d'accueil priv ] }
-    { 5025368;;Date 1              ;Date          ;CaptionML=[DEU=Datum 1;
-                                                              ENU=Date 1;
-                                                              DES=Datum 1;
-                                                              ITS=Data 1;
-                                                              FRS=Date 1] }
-    { 5025369;;Date 2              ;Date          ;CaptionML=[DEU=Datum 2;
-                                                              ENU=Date 2;
-                                                              DES=Datum 2;
-                                                              ITS=Data 2;
-                                                              FRS=Date 2] }
-    { 5025370;;Extra Code 1        ;Code10        ;TableRelation="Addresses - Extra Code 1";
-                                                   CaptionML=[DEU=Zusatzcode 1;
-                                                              ENU=Extra Code 1;
-                                                              DES=Zusatzcode 1;
-                                                              ITS=Codice aggiuntivo 1;
-                                                              FRS=Code additionnel 1] }
-    { 5025371;;Extra Code 2        ;Code10        ;TableRelation="Addresses - Extra Code 2";
-                                                   CaptionML=[DEU=Zusatzcode 2;
-                                                              ENU=Extra Code 2;
-                                                              DES=Zusatzcode 2;
-                                                              ITS=Codice aggiuntivo 2;
-                                                              FRS=Code additionnel 2] }
-    { 5025372;;Extra Code 3        ;Code10        ;TableRelation="Addresses - Extra Code 3";
-                                                   CaptionML=[DEU=Zusatzcode 3;
-                                                              ENU=Extra Code 3;
-                                                              DES=Zusatzcode 3;
-                                                              ITS=Codice aggiuntivo 3;
-                                                              FRS=Code additionnel 3] }
-    { 5025373;;Text 1              ;Text30        ;CaptionML=[DEU=Text 1;
-                                                              ENU=Text 1;
-                                                              DES=Text 1;
-                                                              ITS=Testo 1;
-                                                              FRS=Texte 1] }
-    { 5025374;;Text 2              ;Text30        ;CaptionML=[DEU=Text 2;
-                                                              ENU=Text 2;
-                                                              DES=Text 2;
-                                                              ITS=Testo 2;
-                                                              FRS=Texte 2] }
-    { 5025375;;Text 3              ;Text30        ;CaptionML=[DEU=Text 3;
-                                                              ENU=Text 3;
-                                                              DES=Text 3;
-                                                              ITS=Testo 3;
-                                                              FRS=Texte 3] }
-    { 5025376;;Text 4              ;Text30        ;CaptionML=[DEU=Text 4;
-                                                              ENU=Text 4;
-                                                              DES=Text 4;
-                                                              ITS=Testo 4;
-                                                              FRS=Texte 4] }
-    { 5025377;;Text 5              ;Text30        ;CaptionML=[DEU=Text 5;
-                                                              ENU=Text 5;
-                                                              DES=Text 5;
-                                                              ITS=Testo 5;
-                                                              FRS=Texte 5] }
-    { 5025378;;Text 6              ;Text30        ;CaptionML=[DEU=Text 6;
-                                                              ENU=Text 6;
-                                                              DES=Text 6;
-                                                              ITS=Testo 6;
-                                                              FRS=Texte 6] }
+                                                              FRS="E-mail priv "] }
     { 5028665;;Employee Function Code;Code10      ;TableRelation="Employee Function".Code;
                                                    CaptionML=[DEU=Funktionscode;
                                                               ENU=Employee Function Code;
                                                               DES=Funktionscode;
                                                               ITS=Codice Funzione;
                                                               FRS=Code fonction] }
-    { 5067950;;Street              ;Text30        ;OnValidate=BEGIN
-                                                                /// Start PA022459.BMW
-                                                                Address := AddressManagement.BuildAddressField(Street, "House No.", "Country Code");
-                                                                /// Stop PA022459.BMW
-                                                              END;
-
-                                                   CaptionML=[DEU=Strasse;
-                                                              ENU=Street;
-                                                              DES=Strasse;
-                                                              ITS=Via;
-                                                              FRS=Rue];
-                                                   Description=PA022459.BMW }
-    { 5067951;;House No.           ;Text10        ;OnValidate=BEGIN
-                                                                /// Start PA022459.BMW
-                                                                Address := AddressManagement.BuildAddressField(Street, "House No.", "Country Code");
-                                                                /// Stop PA022459.BMW
-                                                              END;
-
-                                                   CaptionML=[DEU=Hausnr.;
-                                                              ENU=House No.;
-                                                              DES=Hausnr.;
-                                                              ITS=N. civico;
-                                                              FRS=N  domicile];
-                                                   Description=PA022459.BMW }
   }
   KEYS
   {
     {    ;Prospect No.,No.                        ;MaintainSIFTIndex=No;
                                                    Clustered=Yes }
-    {    ;Salesperson Code                        ;MaintainSIFTIndex=No }
     {    ;Search Name                             ;MaintainSIFTIndex=No }
     {    ;Prospect No.,Primary Contact            ;MaintainSIFTIndex=No }
     {    ;Address No.                             ;KeyGroups=PA022228.BMW;
@@ -734,144 +294,9 @@ OBJECT Table 5045160 AIH Contact Temp
   CODE
   {
     VAR
-      Prospt@1109400000 : Record 5047087;
-      ContMgtSetup@1109400001 : Record 5007;
-      CampaignLine@1109400002 : Record 5047092;
-      ProsptContMarketGroup@1109400003 : Record 5047096;
-      Activity@1109400004 : Record 5047094;
-      ContMgtCommentLine@1109400005 : Record 5047093;
-      PostCode@1109400006 : Record 225;
-      ContJobResponsibility@1109400007 : Record 5047090;
-      _INCADEA_@1109400008 : Boolean;
-      SetupAddresses@1109400009 : Record 5029113;
-      AddressSalutation@1109400010 : Record 5029133;
-      TitleTab@1109400011 : Record 5029134;
-      LetterSalutation@1109400012 : Record 5029135;
-      AddressManagement@1109400013 : Codeunit 5029101;
-      ContactName@1109400014 : Text[61];
-      OldSearchtext@1109400015 : Code[30];
-      _BMW_@1117700000 : Integer;
-      BmwRecStatus@1117700001 : Record 5045239;
       Text000@1109400218 : TextConst 'ENU=%1 is too long.;DES=%1 ist zu lang.;ITS=%1   troppo lungo.;FRS=%1 est trop long.';
-      _NSCH_@1116500000 : Integer;
-      Dokument@1116500001 : Record 91600;
-
-    PROCEDURE InsertRecord@4();
-    BEGIN
-      IF "Prospect No." <> '' THEN BEGIN
-        Prospt.GET("Prospect No.");
-        IF Prospt."Last Contact No." = '' THEN
-          Prospt."Last Contact No." := '1'
-        ELSE
-          Prospt."Last Contact No." := INCSTR(Prospt."Last Contact No.");
-        Prospt.MODIFY;
-        "No." := Prospt."Last Contact No.";
-        IF "Salesperson Code" = '' THEN
-          "Salesperson Code" := Prospt."Salesperson Code";
-        IF "Language Code" = '' THEN
-          "Language Code" := Prospt."Language Code";
-      END;
-    END;
-
-    LOCAL PROCEDURE UpdateSalutation@3();
-    BEGIN
-      IF (Salutation = COPYSTR(FormatSalutation(xRec),1,MAXSTRLEN(Salutation))) OR
-         (Salutation = '')
-      THEN BEGIN
-        Salutation := COPYSTR(FormatSalutation(Rec),1,MAXSTRLEN(Salutation));
-        IF STRLEN(FormatSalutation(Rec)) > MAXSTRLEN(Salutation) THEN
-          MESSAGE(Text000,FIELDCAPTION(Salutation));
-      END;
-    END;
-
-    LOCAL PROCEDURE FormatSalutation@1(Cont@1109400000 : Record 5047089) : Text[250];
-    BEGIN
-      ContMgtSetup.GET;
-      //INC2.00
-      IF ContMgtSetup."Name Sequence for Contact"=0 THEN
-        ContactName:=STRSUBSTNO('%1 %2',"Last Name","First Name")
-      ELSE
-        ContactName:=STRSUBSTNO('%1 %2',"First Name","Last Name");
-      // Subsequently Name replaced everywhere with ContactName!!
-
-      WITH Cont DO
-        CASE ContMgtSetup."Salutation Format" OF
-          ContMgtSetup."Salutation Format"::"Salutation Text+Name":
-            EXIT(DELCHR(AddText(ContMgtSetup."Salutation Text") + ContactName,'>'));
-          ContMgtSetup."Salutation Format"::"Salutation Text+Title+Name":
-            EXIT(DELCHR(AddText(ContMgtSetup."Salutation Text") + AddText(Title) + ContactName,'>'));
-          ContMgtSetup."Salutation Format"::"Salutation Text+Title+Job Title+Name":
-            EXIT(DELCHR(AddText(ContMgtSetup."Salutation Text") + AddText(Title) +
-              AddText("Job Title") + ContactName,'>'));
-          ContMgtSetup."Salutation Format"::"Salutation Text+Job Title+Name":
-            EXIT(DELCHR(AddText(ContMgtSetup."Salutation Text") + AddText("Job Title") + ContactName,'>'));
-          ContMgtSetup."Salutation Format"::"Salutation Text+Job Title+Title+Name":
-            EXIT(DELCHR(AddText(ContMgtSetup."Salutation Text") + AddText("Job Title") +
-              AddText(Title) + ContactName,'>'));
-        END;
-      //INC2.00
-    END;
-
-    PROCEDURE AddText@2(Description@1109400000 : Text[249]) : Text[250];
-    BEGIN
-      IF Description <> '' THEN
-        EXIT(Description + ' ');
-    END;
-
-    PROCEDURE Caption@5() : Text[100];
-    BEGIN
-      IF "Prospect No." = '' THEN
-        EXIT('untitled');
-      Prospt.GET("Prospect No.");
-      EXIT(STRSUBSTNO('%1 %2 %3 %4',Prospt."No.",Prospt.Name,"No.",Name));
-    END;
-
-    PROCEDURE __INCADEA__@5025350();
-    BEGIN
-    END;
-
-    PROCEDURE __NSCH__@1117700001();
-    BEGIN
-    END;
-
-    PROCEDURE DatensatzEinf@1117700002();
-    BEGIN
-      //*M01* Start
-      {
-      IF "Prospect No." <> '' THEN BEGIN
-        Prospt.GET("Prospect No.");
-        IF Prospt."Last Contact No." = '' THEN
-          Prospt."Last Contact No." := '1'
-        ELSE
-          Prospt."Last Contact No." := INCSTR(Prospt."Last Contact No.");
-        Prospt.MODIFY;
-        "No." := Prospt."Last Contact No.";
-        IF "Salesperson Code" = '' THEN
-          "Salesperson Code" := Prospt."Salesperson Code";
-        IF "Language Code" = '' THEN
-          "Language Code" := Prospt."Language Code";
-      END;
-      }
-      //*M01* End
-    END;
 
     BEGIN
-    {
-      +----------------------------------------------+
-      | Copyright (c) 2025 Carya AG                  |
-      +----------------------------------------------+
-      |            INCADEA ENGINE                    |
-      +----------------------------------------------+
-      |PA-Number   Date                              |
-      +----------------------------------------------+
-
-       CLCH045     14.05.2025   HAB   AutoIHandel
-                                Reas: Integration von Auto-I-Handel Datenbank
-                                      Neue Temp Tabelle für den Import
-                                Othe: neues Objekt
-    }
-
-    }
     END.
   }
 }
